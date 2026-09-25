@@ -100,10 +100,10 @@ MUTATIONS: list[tuple[str, str, str, str, str]] = [
     # --- a2a-gov-card --------------------------------------------------------------
     ("card", "canonical.rs", "signatures signed over", '        obj.remove("signatures");\n', ""),
     ("card", "canonical.rs", "unknown fields dropped from the spec form", "if matches!(mode, Mode::Spec) {", "if false {"),
-    ("card", "canonical.rs", "REQUIRED fields removed at default", "if presence != Presence::Implicit || !is_default(&v, f.shape, f.kind) {", "if !is_default(&v, f.shape, f.kind) {"),
+    ("card", "canonical.rs", "REQUIRED fields removed at default", "if f.presence != Presence::Implicit || !is_default(&v, f.shape, f.kind) {", "if !is_default(&v, f.shape, f.kind) {"),
     ("card", "canonical.rs", "implicit empty strings kept", "(Shape::Single, Kind::Str, Value::String(s)) => s.is_empty(),", "(Shape::Single, Kind::Str, Value::String(_)) => false,"),
     ("card", "canonical.rs", "a2a-sdk form keeps empty strings", "Value::String(s) if s.is_empty() => None,", "Value::String(s) if s.is_empty() && false => None,"),
-    ("card", "canonical.rs", "a2a-sdk form keeps REQUIRED", "(Mode::A2aSdk, Presence::Required) => Presence::Implicit,", "(Mode::A2aSdk, Presence::Required) => Presence::Required,"),
+    ("card", "canonical.rs", "a2a-sdk form keeps unknown fields", "if matches!(mode, Mode::Spec) {", "if true {"),
     ("card", "lib.rs", "signature not checked", "if jws::verify(&compact, &key).is_ok() {", "if true {"),
     ("card", "lib.rs", "a2a-sdk form always accepted", "if opts.accept_a2a_sdk_form {", "if true {"),
     ("card", "jcs.rs", "keys unsorted", "entries.sort_by(|(a, _), (b, _)| a.encode_utf16().cmp(b.encode_utf16()));", "entries.sort_by(|(a, _), (b, _)| a.cmp(b));"),

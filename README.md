@@ -27,14 +27,15 @@ directions.
 
 > **Status: in development (v0.1, unreleased).** Implemented and tested: the extension
 > surface, AP2-compatible mandates, receipts and the receipt log, the decision engine,
-> and the A2A message shapes. In progress: Agent Card verification, Python bindings for
-> agent developers, an example agent, and gateway integration. Expect breaking changes.
+> the A2A message shapes, and signed Agent Cards. In progress: Python bindings for agent
+> developers, an example agent, and gateway integration. Expect breaking changes.
 
 ## What's here
 
 | Path | What it is |
 |---|---|
 | [`crates/a2a-gov-extension`](crates/a2a-gov-extension) | The A2A side: Agent Card declaration, `A2A-Extensions` activation, the Deny/Challenge error profile |
+| [`crates/a2a-gov-card`](crates/a2a-gov-card) | Signed Agent Cards (A2A §8.4): RFC 8785, default-value removal generated from `a2a.proto`, ES256, fingerprints for pinning |
 | [`crates/a2a-gov-binding`](crates/a2a-gov-binding) | The extension's A2A v1.0 message shapes: mandate request in `TASK_STATE_AUTH_REQUIRED`, continuation with a presentation, receipt artifact |
 | [`crates/a2a-gov-mandate`](crates/a2a-gov-mandate) | Mandate chains in AP2's wire format: issue, delegate, present, verify |
 | [`crates/a2a-gov-pdp`](crates/a2a-gov-pdp) | The decision engine: Pass / Deny / Challenge for a concrete call, with constraints, use limits, nonces and revocation behind store traits |
@@ -43,7 +44,7 @@ directions.
 | [`interop/a2a`](interop/a2a) | The A2A shapes checked with the official `a2a-sdk` |
 | [`scripts/mutation-check.py`](scripts/mutation-check.py) | Mutation testing for every security check |
 | [`testdata`](testdata) | Vectors minted by AP2 and by this implementation |
-| [`docs`](docs) | [Wire format](docs/wire-format.md), [security properties](docs/security.md), [references](docs/references.md) |
+| [`docs`](docs) | [Wire format](docs/wire-format.md), [Agent Cards](docs/agent-cards.md), [security properties](docs/security.md), [references](docs/references.md) |
 
 ## Quickstart
 

@@ -12,8 +12,9 @@ pub(crate) enum Mode {
     /// `optional` fields, keep fields this version doesn't know.
     Spec,
     /// What the official a2a-sdk (1.1.x) signs: the card parsed into protobuf
-    /// (unknown fields dropped, no notion of REQUIRED), then every empty string,
-    /// list and object removed.
+    /// (unknown fields dropped), then every empty string, list and object
+    /// removed. That also removes empty REQUIRED fields, whose defaults are all
+    /// empty strings, lists or objects in the Agent Card schema.
     A2aSdk,
 }
 
@@ -61,11 +62,7 @@ fn strip(value: &Value, message: &str, mode: Mode, depth: usize) -> Result<Value
             ),
             (_, _, v) => v.clone(),
         };
-        let presence = match (mode, f.presence) {
-            (Mode::A2aSdk, Presence::Required) => Presence::Implicit,
-            (_, p) => p,
-        };
-        if presence != Presence::Implicit || !is_default(&v, f.shape, f.kind) {
+        if f.presence != Presence::Implicit || !is_default(&v, f.shape, f.kind) {
             out.insert(key.clone(), v);
         }
     }

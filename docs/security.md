@@ -51,6 +51,17 @@ the suite, and fails if any mutation survives. CI runs it on every change.
 | Two receipts for one presentation via malleability | Receipts carry signature-free `mandate_id` and `presentation_id` and match on them; AP2's `reference` is kept for compatibility but is malleable | `receipts_identify_presentations_independently_of_the_signature_encoding` |
 | Silent edits to the receipt log | Hash chain over sequence, previous hash and receipt | `an_edited_entry_is_detected_at_its_position`, `a_rehashed_forgery_still_breaks_the_next_link`, `a_renumbered_last_entry_is_detected` |
 
+## Agent Cards (`a2a-gov-card`)
+
+| Threat | Control | Test |
+|---|---|---|
+| A tampered card (name, endpoint, extension flags, skills) | ES256 over the §8.4.1 canonical payload | `any_change_to_signed_content_is_detected` |
+| A signer, or header rewrite, pointing verification at its own key | Keys only from the verifier's configuration by `kid`; `jku` is never fetched | `keys_come_only_from_the_verifiers_configuration` |
+| Algorithm confusion (`none`, `HS256`, which the a2a-sdk signer defaults to) | ES256 only | `only_es256_signatures_are_accepted` |
+| Two JSON forms of one card treated differently | RFC 8785, byte-identical to the a2a-sdk; default values and formatting normalized | `the_specs_worked_example_canonicalizes_as_documented`, `every_document_canonicalizes_like_the_a2a_sdk`, `fingerprints_change_with_content_but_not_with_formatting` |
+| Different integers sharing one canonical form | Integers outside ±(2^53 − 1) are refused | `integers_outside_the_exact_range_are_refused` |
+| Unsigned card content accepted silently | Verification reports whether the a2a-sdk's weaker form was used; it can be refused | `cards_signed_over_the_a2a_sdk_form_verify_only_when_allowed` |
+
 ## Error profile and binding (`a2a-gov-extension`, `a2a-gov-binding`)
 
 | Threat | Control | Test |

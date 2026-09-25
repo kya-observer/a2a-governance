@@ -34,13 +34,15 @@ def variant(name: str) -> dict:
     if name == "empty-description":
         card["description"] = ""  # REQUIRED: §8.4.1 keeps it; the a2a-sdk drops it
     if name == "unicode":
-        card["name"] = "Agent für Lesehistorie €"
+        card["name"] = "Agent f\u00fcr Lesehistorie \u20ac"
+    if name == "empty-param":
+        card["capabilities"]["extensions"][0]["params"]["note"] = ""  # the a2a-sdk doesn't sign this
     return card
 
 
 def main() -> None:
     vectors = []
-    for name in ["plain", "empty-description", "unicode"]:
+    for name in ["plain", "empty-description", "unicode", "empty-param"]:
         private = ec.generate_private_key(ec.SECP256R1())
         jwk_private = ECAlgorithm.to_jwk(private, as_dict=True)
         public = {k: v for k, v in jwk_private.items() if k in ("kty", "crv", "x", "y")}

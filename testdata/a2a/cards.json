@@ -21,10 +21,10 @@
               "uri": "https://example.org/ext/v1",
               "required": true,
               "params": {
-                "n": 3.0,
                 "mandateFormats": [
                   "dc+sd-jwt"
-                ]
+                ],
+                "n": 3.0
               }
             }
           ]
@@ -48,7 +48,7 @@
         "signatures": [
           {
             "protected": "eyJhbGciOiJFUzI1NiIsImprdSI6bnVsbCwia2lkIjoia2V5LXBsYWluIiwidHlwIjoiSk9TRSJ9",
-            "signature": "-x7JiJ2s5SxDev9U3x0sbyyN-Qvtgc2uPvmETtmF1_ahp4FvRgAbDEFIqK79wseezxWx3mZV7XRNvQcFydkwgg"
+            "signature": "3Qv1gHpjAmKRyUMBeaN-2sKkl_Rbm5vzjnGyVxG83w1ilPAAZkqxZREuW8wX2Xa1WFG5--yKFOoGM8XqdBYvYA"
           }
         ]
       },
@@ -56,8 +56,8 @@
       "jwk": {
         "kty": "EC",
         "crv": "P-256",
-        "x": "p6j9SOu8fkrq_BiuNQmt5uURSvtcMIHDgssUYN0WN_k",
-        "y": "GtiNizVwJQooOkYUunSDKh46tohwOfDhT1t34zPTkDE"
+        "x": "fI7aDcOXIDqbfcpat8k3IKYV68ShqMWoV6tEfrZ7aDE",
+        "y": "iTkShjNdvEA5_TjYIjMjLDt2tM4osyoNQ5poi1M3J70"
       }
     },
     {
@@ -79,10 +79,10 @@
               "uri": "https://example.org/ext/v1",
               "required": true,
               "params": {
-                "n": 3.0,
                 "mandateFormats": [
                   "dc+sd-jwt"
-                ]
+                ],
+                "n": 3.0
               }
             }
           ]
@@ -106,7 +106,7 @@
         "signatures": [
           {
             "protected": "eyJhbGciOiJFUzI1NiIsImprdSI6bnVsbCwia2lkIjoia2V5LWVtcHR5LWRlc2NyaXB0aW9uIiwidHlwIjoiSk9TRSJ9",
-            "signature": "QKAP9046qKieG5QaLIAHiX63SdDKK1T73ki2lOhgGb7zV_b0zSF0i5TYaRpd_W3crKfV3xPG4MmnSaN7fF0xHw"
+            "signature": "T-N1mIuauzag_kSPHvzN15kX0T-8jBBLpITlEv9lWj8NkSLZFoeTSZLMpXsyteZ57QHe9qRqhUyVG2FugBoEzw"
           }
         ]
       },
@@ -114,8 +114,8 @@
       "jwk": {
         "kty": "EC",
         "crv": "P-256",
-        "x": "MdBEvEI6ZZKZLNhx8ZdjeGMknza8omt960DhjQQdLBk",
-        "y": "Dd3Kc-fKISvbsNI3dmw6nU8Q-BIow1D4iDdSPI0afV0"
+        "x": "gsaUpJ4ywHlZUvDAoCFoz2qpF4eJQHHbdImUUDRky2g",
+        "y": "u3r2CMlXVDUL1VTpFokC4SYDvtt-IpJMFmmhSnacWJ4"
       }
     },
     {
@@ -138,10 +138,10 @@
               "uri": "https://example.org/ext/v1",
               "required": true,
               "params": {
-                "n": 3.0,
                 "mandateFormats": [
                   "dc+sd-jwt"
-                ]
+                ],
+                "n": 3.0
               }
             }
           ]
@@ -165,7 +165,7 @@
         "signatures": [
           {
             "protected": "eyJhbGciOiJFUzI1NiIsImprdSI6bnVsbCwia2lkIjoia2V5LXVuaWNvZGUiLCJ0eXAiOiJKT1NFIn0",
-            "signature": "U1mE1omKNNPga9-8OnVbZXhTNgik1CnRoyoYkSqL58tYIXMKegZqf_N5Occ5tQwPUOEOMZdB8CUs-Uwls9diNQ"
+            "signature": "lfDP6kYtTq0Da6NyynbA3yn3ciwKcrbD0T5jgkZACR9OQAb6g0fuN5-sCVsvHXusPBsS-dyo8wN2EhgARGxhdw"
           }
         ]
       },
@@ -173,8 +173,68 @@
       "jwk": {
         "kty": "EC",
         "crv": "P-256",
-        "x": "IL5Lx21oTyZk3Km44CZHtk45fD_3yaIUjQIT8_IfklA",
-        "y": "DOzIimmO5OsMkEOl3eXNv2nBBAP7KCeDJjUn__QrS_Q"
+        "x": "RYqy0lx0jC_bAUh_6amc5raROIm_oadjtOHjB47PnPk",
+        "y": "ecJWdtxaxrjNSsJsyBkERATFaKRzQXAXl7TP4AiHFew"
+      }
+    },
+    {
+      "name": "empty-param",
+      "card": {
+        "name": "Example vault agent",
+        "description": "Answers questions about a reading history",
+        "supportedInterfaces": [
+          {
+            "url": "https://vault.example.org/a2a",
+            "protocolBinding": "JSONRPC",
+            "protocolVersion": "1.0"
+          }
+        ],
+        "version": "0.1.0",
+        "capabilities": {
+          "streaming": false,
+          "extensions": [
+            {
+              "uri": "https://example.org/ext/v1",
+              "required": true,
+              "params": {
+                "note": "",
+                "mandateFormats": [
+                  "dc+sd-jwt"
+                ],
+                "n": 3.0
+              }
+            }
+          ]
+        },
+        "defaultInputModes": [
+          "text/plain"
+        ],
+        "defaultOutputModes": [
+          "text/plain"
+        ],
+        "skills": [
+          {
+            "id": "reading",
+            "name": "Reading",
+            "description": "Answers from reading history",
+            "tags": [
+              "reading"
+            ]
+          }
+        ],
+        "signatures": [
+          {
+            "protected": "eyJhbGciOiJFUzI1NiIsImprdSI6bnVsbCwia2lkIjoia2V5LWVtcHR5LXBhcmFtIiwidHlwIjoiSk9TRSJ9",
+            "signature": "JfEVVlfeSals5l7g-WDWpKFa3dZvx29duxGKFsYuqBUxnm-z4WTJ1yDYLVan2rt2sIfv7y_4K118wSaOa_sUiQ"
+          }
+        ]
+      },
+      "kid": "key-empty-param",
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "x": "DID0ns7LwEL8NMEt71Rk_IODJ5WZA9EOkAc38eEzvSY",
+        "y": "RnErBBayiT3xoNS89UkWVSqeKb4lpEOfpcVrdvJBIhI"
       }
     }
   ]

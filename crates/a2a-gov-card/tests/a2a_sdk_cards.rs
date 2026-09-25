@@ -68,3 +68,36 @@ fn an_sdk_signed_card_with_an_empty_required_field() {
     };
     assert!(verify(&v["card"], lookup, &strict).is_err());
 }
+
+#[test]
+fn an_empty_extension_param_is_not_covered_by_an_sdk_signature() {
+    // The a2a-sdk drops empty values inside `params` before signing; the card as
+    // served still carries them. Only the a2a-sdk form verifies, and says so.
+    let v = vector("empty-param");
+    assert_eq!(
+        v["card"]["capabilities"]["extensions"][0]["params"]["note"],
+        serde_json::json!("")
+    );
+    assert_eq!(
+        check("empty-param", &VerifyOptions::default())
+            .unwrap()
+            .form,
+        Form::A2aSdk
+    );
+}
+
+#[test]
+fn fields_the_sdk_doesnt_know_are_outside_its_signature() {
+    // A server may serve fields a newer spec added; the a2a-sdk signs without them.
+    let mut v = vector("plain");
+    v["card"]["futureField"] = serde_json::json!("x");
+    let key = PublicJwk::from_value(&v["jwk"]).unwrap();
+    let kid = v["kid"].as_str().unwrap().to_owned();
+    let verified = verify(
+        &v["card"],
+        |k| (k == kid).then(|| key.clone()),
+        &VerifyOptions::default(),
+    )
+    .unwrap();
+    assert_eq!(verified.form, Form::A2aSdk);
+}

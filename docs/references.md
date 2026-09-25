@@ -8,6 +8,8 @@ Versions and dates are the ones this implementation was built and tested against
 |---|---|
 | [A2A Protocol Specification v1.0](https://a2a-protocol.org/latest/specification/) ([source](https://github.com/a2aproject/A2A/blob/main/docs/specification.md), `main` @ `72b3761`, 2026-09-25; release v1.0.1, 2026-05-26) | §3.2.6 `A2A-Extensions`; §3.3.2, §5.4, §9.5 errors; §4.6 extensions; §7.6 in-task authorization, including §7.6.4 *In-Task Authorization Scope* ([#2081](https://github.com/a2aproject/A2A/pull/2081), 2026-07-30) |
 | [RFC 9901: Selective Disclosure for JWTs](https://www.rfc-editor.org/rfc/rfc9901) (Nov 2025) | Disclosures, digests, verification (§7.1); test values from §5.2 |
+| [RFC 8785: JSON Canonicalization Scheme](https://www.rfc-editor.org/rfc/rfc8785) | Agent Card payloads; test values from Appendix B and sections 3.2.2 to 3.2.4 |
+| [A2A v1.0 §8.4 Agent Card Signing](https://a2a-protocol.org/latest/specification/#84-agent-card-signing) and [`a2a.proto`](https://github.com/a2aproject/A2A/blob/72b3761bd84c59291da694dcd97cdfc2c010df39/specification/a2a.proto) @ `72b3761` | Canonicalization rules; the generated field table |
 | [RFC 7515: JSON Web Signature](https://www.rfc-editor.org/rfc/rfc7515) | Compact serialization |
 | [RFC 7518 §3.4: ES256](https://www.rfc-editor.org/rfc/rfc7518#section-3.4) | Signature algorithm |
 | [RFC 7517: JSON Web Key](https://www.rfc-editor.org/rfc/rfc7517) and [RFC 7800: Proof-of-Possession Key Semantics](https://www.rfc-editor.org/rfc/rfc7800) | `cnf.jwk` |
@@ -38,4 +40,5 @@ Versions and dates are the ones this implementation was built and tested against
 | [`base64`](https://github.com/marshallpierce/rust-base64) | 0.23 | Apache-2.0 OR MIT |
 | [`getrandom`](https://github.com/rust-random/getrandom) | 0.4 | Apache-2.0 OR MIT |
 | [`serde_json`](https://github.com/serde-rs/json) | 1 | Apache-2.0 OR MIT |
+| [a2a-sdk (Python)](https://pypi.org/project/a2a-sdk/) (test oracle only) | 1.1.5, with the `signing` extra | Apache-2.0 |
 | [Google AP2 Python SDK](https://github.com/google-agentic-commerce/AP2/tree/main/code/sdk/python) (test oracle only) | commit `e1ea56d` | Apache-2.0 |
