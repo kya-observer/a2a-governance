@@ -1,6 +1,8 @@
 [workspace]
 resolver = "3"
-members = ["crates/*"]
+members = ["crates/*", "bindings/python"]
+# The Python extension is built with maturin (bindings/python), not by `cargo test`.
+default-members = ["crates/*"]
 
 [workspace.package]
 version = "0.1.0"

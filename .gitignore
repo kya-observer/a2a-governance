@@ -3,3 +3,5 @@
 .venv/
 *.pyc
 .pytest_cache/
+bindings/python/python/a2a_governance/*.so
+bindings/python/python/a2a_governance/*.pyd

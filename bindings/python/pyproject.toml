@@ -1,0 +1,27 @@
+[build-system]
+requires = ["maturin>=1.15,<2"]
+build-backend = "maturin"
+
+[project]
+name = "a2a-governance"
+version = "0.1.0"
+description = "Agent-side support for the A2A Delegation Governance extension: present mandates, read Deny/Challenge, verify receipts"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+classifiers = ["Programming Language :: Rust", "Programming Language :: Python :: 3"]
+dependencies = []
+
+[project.optional-dependencies]
+a2a = ["a2a-sdk>=1.1.5,<2"]
+
+[dependency-groups]
+dev = ["pytest>=9", "maturin>=1.15,<2", "a2a-sdk==1.1.5"]
+
+[tool.maturin]
+python-source = "python"
+module-name = "a2a_governance._native"
+features = ["pyo3/extension-module"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

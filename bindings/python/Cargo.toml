@@ -1,22 +1,24 @@
 [package]
-name = "a2a-gov-pdp"
-description = "Decision engine for the A2A Delegation Governance extension: verifies a mandate chain against a concrete A2A call"
+name = "a2a-gov-py"
+description = "Python bindings for the A2A Delegation Governance extension (agent side)"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
+publish = false
+
+[lib]
+name = "_native"
+crate-type = ["cdylib"]
 
 [dependencies]
+a2a-gov-binding.workspace = true
 a2a-gov-extension.workspace = true
 a2a-gov-mandate.workspace = true
 a2a-gov-receipt.workspace = true
-base64 = "0.23.1"
-getrandom = "0.4.3"
+pyo3 = { version = "0.29", features = ["abi3-py310"] }
 serde_json.workspace = true
 
 [lints]
 workspace = true
-
-[dev-dependencies]
-a2a-gov-binding = { path = "../a2a-gov-binding" }
