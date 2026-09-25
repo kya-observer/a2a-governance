@@ -1,0 +1,16 @@
+[project]
+name = "a2a-gov-interop-a2a"
+version = "0.1.0"
+description = "Checks the extension's A2A message shapes with the official a2a-sdk"
+requires-python = ">=3.12,<3.14"
+license = "Apache-2.0"
+dependencies = [
+    "a2a-sdk==1.1.5",
+    "pytest>=9",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.uv]
+package = false

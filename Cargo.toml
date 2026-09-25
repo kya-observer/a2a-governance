@@ -14,6 +14,7 @@ a2a-gov-extension = { path = "crates/a2a-gov-extension" }
 a2a-gov-mandate = { path = "crates/a2a-gov-mandate" }
 a2a-gov-receipt = { path = "crates/a2a-gov-receipt" }
 a2a-gov-pdp = { path = "crates/a2a-gov-pdp" }
+a2a-gov-binding = { path = "crates/a2a-gov-binding" }
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["preserve_order"] }
 thiserror = "2"

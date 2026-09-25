@@ -3,6 +3,16 @@
 version = 4
 
 [[package]]
+name = "a2a-gov-binding"
+version = "0.1.0"
+dependencies = [
+ "a2a-gov-extension",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
 name = "a2a-gov-extension"
 version = "0.1.0"
 dependencies = [

@@ -1,0 +1,165 @@
+{
+  "description": "testdata/rust/binding.json after a2a-sdk 1.1.5 ParseDict + MessageToDict.",
+  "task_status": {
+    "pending": {
+      "state": "TASK_STATE_AUTH_REQUIRED",
+      "message": {
+        "messageId": "m1",
+        "contextId": "c1",
+        "taskId": "t1",
+        "role": "ROLE_AGENT",
+        "parts": [
+          {
+            "text": "Approval needed"
+          }
+        ],
+        "metadata": {
+          "https://kya.observer/ext/a2a-governance/v0.1": {
+            "approvalUrl": "https://approve.example.org/c/ch_1",
+            "nonce": "n1",
+            "aud": "https://vault.example.org/a2a",
+            "state": "pending",
+            "challengeId": "ch_1",
+            "mandateRequest": {
+              "exp": 1790003600.0,
+              "constraints": [
+                {
+                  "type": "access.authorization_details",
+                  "authorization_details": [
+                    {
+                      "type": "reading",
+                      "actions": [
+                        "search"
+                      ],
+                      "fields": [
+                        "title"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "access.max_uses",
+                  "max_uses": 3.0
+                }
+              ],
+              "vct": "mandate.access.1"
+            }
+          }
+        },
+        "extensions": [
+          "https://kya.observer/ext/a2a-governance/v0.1"
+        ]
+      }
+    },
+    "approved": {
+      "state": "TASK_STATE_AUTH_REQUIRED",
+      "message": {
+        "messageId": "m2",
+        "contextId": "c1",
+        "taskId": "t1",
+        "role": "ROLE_AGENT",
+        "parts": [
+          {
+            "text": "Approved"
+          }
+        ],
+        "metadata": {
+          "https://kya.observer/ext/a2a-governance/v0.1": {
+            "nonce": "n2",
+            "mandate": "eyJhbGciOiJFUzI1NiJ9.e30.sig~",
+            "aud": "https://vault.example.org/a2a",
+            "state": "approved"
+          }
+        },
+        "extensions": [
+          "https://kya.observer/ext/a2a-governance/v0.1"
+        ]
+      }
+    },
+    "denied": {
+      "state": "TASK_STATE_REJECTED",
+      "message": {
+        "messageId": "m3",
+        "contextId": "c1",
+        "taskId": "t1",
+        "role": "ROLE_AGENT",
+        "parts": [
+          {
+            "text": "Denied"
+          }
+        ],
+        "metadata": {
+          "https://kya.observer/ext/a2a-governance/v0.1": {
+            "reason": "denied by the user",
+            "state": "denied"
+          }
+        },
+        "extensions": [
+          "https://kya.observer/ext/a2a-governance/v0.1"
+        ]
+      }
+    }
+  },
+  "message": {
+    "hello": {
+      "messageId": "m0",
+      "contextId": "c1",
+      "role": "ROLE_USER",
+      "parts": [
+        {
+          "text": "What have I read about Rust?"
+        }
+      ],
+      "metadata": {
+        "https://kya.observer/ext/a2a-governance/v0.1": {
+          "holderJwk": {
+            "y": "BBBB",
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "AAAA"
+          }
+        }
+      },
+      "extensions": [
+        "https://kya.observer/ext/a2a-governance/v0.1"
+      ]
+    },
+    "continuation": {
+      "messageId": "m4",
+      "contextId": "c1",
+      "taskId": "t1",
+      "role": "ROLE_USER",
+      "parts": [
+        {
+          "text": "Continuing with the mandate"
+        }
+      ],
+      "metadata": {
+        "https://kya.observer/ext/a2a-governance/v0.1": {
+          "nonce": "n2",
+          "presentation": "open~~closing~"
+        }
+      },
+      "extensions": [
+        "https://kya.observer/ext/a2a-governance/v0.1"
+      ]
+    }
+  },
+  "artifact": {
+    "artifactId": "a1",
+    "parts": [
+      {
+        "text": "You read 3 articles about Rust."
+      }
+    ],
+    "metadata": {
+      "https://kya.observer/ext/a2a-governance/v0.1": {
+        "receipt": "eyJhbGciOiJFUzI1NiJ9.e30.sig",
+        "nextNonce": "n3"
+      }
+    },
+    "extensions": [
+      "https://kya.observer/ext/a2a-governance/v0.1"
+    ]
+  }
+}

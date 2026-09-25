@@ -1,0 +1,282 @@
+{
+  "description": "The Delegation Governance extension's A2A v1.0 shapes, from a2a-gov-binding.",
+  "extension_uri": "https://kya.observer/ext/a2a-governance/v0.1",
+  "task_status": {
+    "pending": {
+      "state": "TASK_STATE_AUTH_REQUIRED",
+      "message": {
+        "messageId": "m1",
+        "contextId": "c1",
+        "role": "ROLE_AGENT",
+        "parts": [
+          {
+            "text": "Approval needed"
+          }
+        ],
+        "extensions": [
+          "https://kya.observer/ext/a2a-governance/v0.1"
+        ],
+        "metadata": {
+          "https://kya.observer/ext/a2a-governance/v0.1": {
+            "state": "pending",
+            "mandateRequest": {
+              "vct": "mandate.access.1",
+              "exp": 1790003600,
+              "constraints": [
+                {
+                  "type": "access.authorization_details",
+                  "authorization_details": [
+                    {
+                      "type": "reading",
+                      "actions": [
+                        "search"
+                      ],
+                      "fields": [
+                        "title"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "access.max_uses",
+                  "max_uses": 3
+                }
+              ]
+            },
+            "approvalUrl": "https://approve.example.org/c/ch_1",
+            "challengeId": "ch_1",
+            "aud": "https://vault.example.org/a2a",
+            "nonce": "n1"
+          }
+        },
+        "taskId": "t1"
+      }
+    },
+    "approved": {
+      "state": "TASK_STATE_AUTH_REQUIRED",
+      "message": {
+        "messageId": "m2",
+        "contextId": "c1",
+        "role": "ROLE_AGENT",
+        "parts": [
+          {
+            "text": "Approved"
+          }
+        ],
+        "extensions": [
+          "https://kya.observer/ext/a2a-governance/v0.1"
+        ],
+        "metadata": {
+          "https://kya.observer/ext/a2a-governance/v0.1": {
+            "state": "approved",
+            "mandate": "eyJhbGciOiJFUzI1NiJ9.e30.sig~",
+            "aud": "https://vault.example.org/a2a",
+            "nonce": "n2"
+          }
+        },
+        "taskId": "t1"
+      }
+    },
+    "denied": {
+      "state": "TASK_STATE_REJECTED",
+      "message": {
+        "messageId": "m3",
+        "contextId": "c1",
+        "role": "ROLE_AGENT",
+        "parts": [
+          {
+            "text": "Denied"
+          }
+        ],
+        "extensions": [
+          "https://kya.observer/ext/a2a-governance/v0.1"
+        ],
+        "metadata": {
+          "https://kya.observer/ext/a2a-governance/v0.1": {
+            "state": "denied",
+            "reason": "denied by the user"
+          }
+        },
+        "taskId": "t1"
+      }
+    }
+  },
+  "message": {
+    "hello": {
+      "messageId": "m0",
+      "contextId": "c1",
+      "role": "ROLE_USER",
+      "parts": [
+        {
+          "text": "What have I read about Rust?"
+        }
+      ],
+      "extensions": [
+        "https://kya.observer/ext/a2a-governance/v0.1"
+      ],
+      "metadata": {
+        "https://kya.observer/ext/a2a-governance/v0.1": {
+          "holderJwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "AAAA",
+            "y": "BBBB"
+          }
+        }
+      }
+    },
+    "continuation": {
+      "messageId": "m4",
+      "contextId": "c1",
+      "role": "ROLE_USER",
+      "parts": [
+        {
+          "text": "Continuing with the mandate"
+        }
+      ],
+      "extensions": [
+        "https://kya.observer/ext/a2a-governance/v0.1"
+      ],
+      "metadata": {
+        "https://kya.observer/ext/a2a-governance/v0.1": {
+          "presentation": "open~~closing~",
+          "nonce": "n2"
+        }
+      },
+      "taskId": "t1"
+    }
+  },
+  "artifact": {
+    "artifactId": "a1",
+    "parts": [
+      {
+        "text": "You read 3 articles about Rust."
+      }
+    ],
+    "extensions": [
+      "https://kya.observer/ext/a2a-governance/v0.1"
+    ],
+    "metadata": {
+      "https://kya.observer/ext/a2a-governance/v0.1": {
+        "receipt": "eyJhbGciOiJFUzI1NiJ9.e30.sig",
+        "nextNonce": "n3"
+      }
+    }
+  },
+  "task": {
+    "id": "t1",
+    "contextId": "c1",
+    "status": {
+      "state": "TASK_STATE_AUTH_REQUIRED",
+      "message": {
+        "messageId": "m1",
+        "contextId": "c1",
+        "role": "ROLE_AGENT",
+        "parts": [
+          {
+            "text": "Approval needed"
+          }
+        ],
+        "extensions": [
+          "https://kya.observer/ext/a2a-governance/v0.1"
+        ],
+        "metadata": {
+          "https://kya.observer/ext/a2a-governance/v0.1": {
+            "state": "pending",
+            "mandateRequest": {
+              "vct": "mandate.access.1",
+              "exp": 1790003600,
+              "constraints": [
+                {
+                  "type": "access.authorization_details",
+                  "authorization_details": [
+                    {
+                      "type": "reading",
+                      "actions": [
+                        "search"
+                      ],
+                      "fields": [
+                        "title"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "access.max_uses",
+                  "max_uses": 3
+                }
+              ]
+            },
+            "approvalUrl": "https://approve.example.org/c/ch_1",
+            "challengeId": "ch_1",
+            "aud": "https://vault.example.org/a2a",
+            "nonce": "n1"
+          }
+        },
+        "taskId": "t1"
+      }
+    },
+    "artifacts": [
+      {
+        "artifactId": "a1",
+        "parts": [
+          {
+            "text": "You read 3 articles about Rust."
+          }
+        ],
+        "extensions": [
+          "https://kya.observer/ext/a2a-governance/v0.1"
+        ],
+        "metadata": {
+          "https://kya.observer/ext/a2a-governance/v0.1": {
+            "receipt": "eyJhbGciOiJFUzI1NiJ9.e30.sig",
+            "nextNonce": "n3"
+          }
+        }
+      }
+    ]
+  },
+  "agent_card": {
+    "name": "Example vault agent",
+    "description": "Answers questions about a reading history",
+    "version": "0.1.0",
+    "supportedInterfaces": [
+      {
+        "url": "https://vault.example.org/a2a",
+        "protocolBinding": "JSONRPC",
+        "protocolVersion": "1.0"
+      }
+    ],
+    "capabilities": {
+      "streaming": false,
+      "extensions": [
+        {
+          "uri": "https://kya.observer/ext/a2a-governance/v0.1",
+          "description": "Mandate-based in-task authorization: scoped, key-bound grants approved by the user, verified per call, with signed receipts",
+          "required": true,
+          "params": {
+            "mandateFormats": [
+              "dc+sd-jwt"
+            ]
+          }
+        }
+      ]
+    },
+    "defaultInputModes": [
+      "text/plain"
+    ],
+    "defaultOutputModes": [
+      "text/plain"
+    ],
+    "skills": [
+      {
+        "id": "reading",
+        "name": "Reading history",
+        "description": "Answers from reading history",
+        "tags": [
+          "reading"
+        ]
+      }
+    ]
+  }
+}
