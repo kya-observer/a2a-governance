@@ -158,7 +158,7 @@ fn an_expired_mandate_is_rejected() {
         v["nonce"].as_str().unwrap(),
         exp + 3600,
     )
-    .max_closing_age(i64::MAX);
+    .max_closing_age(u32::MAX);
     let err = verify_chain(v["chain"].as_str().unwrap(), |_| Some(root_key(v)), &late).unwrap_err();
     assert_eq!(err, Error::Expired);
 }
@@ -186,7 +186,10 @@ fn a_constraint_cannot_be_stripped_from_the_open_mandate() {
     );
     let tampered = format!("{}~~{rest}", kept.join("~"));
     let err = verify_chain(&tampered, |_| Some(root_key(v)), &opts(v)).unwrap_err();
-    assert!(matches!(err, Error::Binding(_)), "{err}");
+    assert!(
+        matches!(err, Error::Disclosure(_) | Error::Binding(_)),
+        "{err}"
+    );
 }
 
 #[test]
@@ -254,4 +257,22 @@ fn high_s_signatures_from_ap2_are_accepted() {
         high > 0 && high < total,
         "{high} of {total} signatures are high-S"
     );
+}
+
+#[test]
+fn any_change_to_the_open_mandate_after_the_agent_signed_breaks_the_binding() {
+    // Reordering keeps every disclosure present and resolvable; only the closing
+    // hop's sd_hash notices.
+    let v = &vectors()[0];
+    let chain = v["chain"].as_str().unwrap();
+    let (root, rest) = chain.split_once("~~").unwrap();
+    let mut parts: Vec<&str> = root.split('~').collect();
+    parts.swap(1, 2);
+    let err = verify_chain(
+        &format!("{}~~{rest}", parts.join("~")),
+        |_| Some(root_key(v)),
+        &opts(v),
+    )
+    .unwrap_err();
+    assert!(matches!(err, Error::Binding(_)), "{err}");
 }

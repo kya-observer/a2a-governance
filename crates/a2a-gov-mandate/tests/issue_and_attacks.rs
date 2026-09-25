@@ -394,5 +394,156 @@ fn hop_ids_are_stable_across_presentations_of_one_mandate() {
     assert_eq!(a.hops()[0].id(), b.hops()[0].id());
     assert_ne!(a.hops()[1].id(), b.hops()[1].id());
     let jwt = f.open.split('~').next().unwrap();
-    assert_eq!(a.hops()[0].id(), a2a_gov_mandate::sdjwt::digest(jwt));
+    assert_eq!(a.hops()[0].id(), a2a_gov_mandate::hop_id(jwt));
+}
+
+// --- Review findings (2026-09-25) -----------------------------------------------------
+
+fn without_disclosure(
+    token: &str,
+    drop: impl Fn(&a2a_gov_mandate::sdjwt::Disclosure) -> bool,
+) -> String {
+    let parts: Vec<&str> = token.trim_end_matches('~').split('~').collect();
+    let kept: Vec<&str> = parts
+        .iter()
+        .copied()
+        .filter(|p| !a2a_gov_mandate::sdjwt::Disclosure::parse(p).is_ok_and(|d| drop(&d)))
+        .collect();
+    assert_eq!(
+        kept.len(),
+        parts.len() - 1,
+        "exactly one disclosure must be dropped"
+    );
+    format!("{}~", kept.join("~"))
+}
+
+#[test]
+fn the_agent_cannot_withhold_a_constraint_it_dislikes() {
+    // The agent signs its own closing hop, so sd_hash binds whatever the agent
+    // chose to forward. Withholding must be refused on its own terms.
+    let f = fixture();
+    let max_uses = json!({ "type": "access.max_uses", "max_uses": 3 });
+    let stripped = without_disclosure(&f.open, |d| *d.value() == max_uses);
+    let hop = present(
+        &stripped,
+        &closed_mandate(),
+        &Disclosable::none(),
+        &f.agent,
+        AUD,
+        NONCE,
+        NOW,
+    )
+    .unwrap();
+    let err = verify(&f, &join(&[&stripped, &hop])).unwrap_err();
+    assert!(matches!(err, Error::Disclosure(_)), "{err}");
+}
+
+fn flip_s(jwt: &str) -> String {
+    // (r, s) -> (r, n - s): the other valid ECDSA signature over the same input.
+    const N: [u8; 32] = [
+        0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+        0xff, 0xbc, 0xe6, 0xfa, 0xad, 0xa7, 0x17, 0x9e, 0x84, 0xf3, 0xb9, 0xca, 0xc2, 0xfc, 0x63,
+        0x25, 0x51,
+    ];
+    let (input, sig) = jwt.rsplit_once('.').unwrap();
+    let mut bytes = base64::engine::general_purpose::URL_SAFE_NO_PAD
+        .decode(sig)
+        .unwrap();
+    let mut borrow = 0i16;
+    for i in (0..32).rev() {
+        let d = i16::from(N[i]) - i16::from(bytes[32 + i]) - borrow;
+        bytes[32 + i] = u8::try_from(d.rem_euclid(256)).unwrap();
+        borrow = i16::from(d < 0);
+    }
+    format!(
+        "{input}.{}",
+        base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(bytes)
+    )
+}
+
+#[test]
+fn a_malleated_root_signature_keeps_the_same_mandate_id() {
+    // Anyone can rewrite s to n - s and the signature still verifies. The ID used
+    // for use counting and revocation must not change when they do.
+    let f = fixture();
+    let (jwt, rest) = f.open.split_once('~').unwrap();
+    let twin = format!("{}~{rest}", flip_s(jwt));
+    assert_ne!(twin, f.open);
+    let a = verify(&f, &join(&[&f.open, &closing(&f, closed_mandate(), NOW)])).unwrap();
+    let twin_hop = present(
+        &twin,
+        &closed_mandate(),
+        &Disclosable::none(),
+        &f.agent,
+        AUD,
+        NONCE,
+        NOW,
+    )
+    .unwrap();
+    let b = verify(&f, &join(&[&twin, &twin_hop])).expect("the malleated twin still verifies");
+    assert_eq!(a.hops()[0].id(), b.hops()[0].id());
+}
+
+fn verify_later(
+    surface: &SigningKey,
+    chain: &str,
+    now: i64,
+) -> Result<a2a_gov_mandate::VerifiedChain, Error> {
+    let key = surface.public_jwk();
+    verify_chain(
+        chain,
+        move |_| Some(key.clone()),
+        &VerifyOptions::new(AUD, NONCE, now),
+    )
+}
+
+#[test]
+fn an_open_mandate_without_exp_is_refused() {
+    let surface = SigningKey::generate();
+    let agent = SigningKey::generate();
+    let mut open = open_mandate(&agent);
+    open.remove("exp");
+    let token = issue_open(&open, &Disclosable::none(), &surface).unwrap();
+    let later = NOW + 10 * 365 * 86_400;
+    let hop = present(
+        &token,
+        &closed_mandate(),
+        &Disclosable::none(),
+        &agent,
+        AUD,
+        NONCE,
+        later,
+    )
+    .unwrap();
+    let err = verify_later(&surface, &join(&[&token, &hop]), later).unwrap_err();
+    assert!(matches!(err, Error::Chain(_)), "{err}");
+}
+
+#[test]
+fn the_agent_cannot_withhold_exp() {
+    let surface = SigningKey::generate();
+    let agent = SigningKey::generate();
+    let token = issue_open(
+        &open_mandate(&agent),
+        &Disclosable::fields(["exp"]),
+        &surface,
+    )
+    .unwrap();
+    let stripped = without_disclosure(&token, |d| d.name() == Some("exp"));
+    let later = NOW + 10 * 365 * 86_400;
+    let hop = present(
+        &stripped,
+        &closed_mandate(),
+        &Disclosable::none(),
+        &agent,
+        AUD,
+        NONCE,
+        later,
+    )
+    .unwrap();
+    let err = verify_later(&surface, &join(&[&stripped, &hop]), later).unwrap_err();
+    assert!(
+        matches!(err, Error::Disclosure(_) | Error::Chain(_)),
+        "{err}"
+    );
 }

@@ -5,6 +5,12 @@
 //! AP2 v0.2 names the outcome `result` in its prose and `status` in its schemas
 //! and SDK. This crate emits the schema form (`status: "Success" | "Error"`) and
 //! accepts both.
+//!
+//! AP2's `reference` hashes the closing hop *including* its ECDSA signature,
+//! which is malleable (`s` → `n − s`), so two encodings of one presentation have
+//! two references. It's kept for AP2 compatibility, but receipts also carry
+//! `mandate_id` and `presentation_id`, computed without signatures; match and
+//! key receipts on those.
 
 pub mod log;
 
@@ -45,6 +51,8 @@ pub struct Receipt {
     iat: i64,
     outcome: Outcome,
     reference: String,
+    mandate_id: Option<String>,
+    presentation_id: Option<String>,
     method: Option<String>,
     task_id: Option<String>,
     purpose: Option<String>,
@@ -61,12 +69,24 @@ impl Receipt {
             iat,
             outcome,
             reference,
+            mandate_id: None,
+            presentation_id: None,
             method: None,
             task_id: None,
             purpose: None,
             released: Vec::new(),
             prev: None,
         }
+    }
+
+    /// A receipt for a presentation `chain`, carrying AP2's `reference` and the
+    /// signature-independent `mandate_id` and `presentation_id`.
+    pub fn for_chain(iss: &str, iat: i64, outcome: Outcome, chain: &str) -> Result<Self, Error> {
+        let mut receipt = Self::new(iss, iat, outcome, reference_for(chain)?);
+        let root_jwt = chain.split('~').next().unwrap_or_default();
+        receipt.mandate_id = Some(a2a_gov_mandate::hop_id(root_jwt));
+        receipt.presentation_id = Some(presentation_id(chain)?);
+        Ok(receipt)
     }
 
     /// The A2A method the decision was about.
@@ -141,9 +161,13 @@ impl Receipt {
         Ok(jws::decode(compact)?.payload)
     }
 
-    /// Whether this receipt refers to `chain`, by the AP2 spec's reference or
-    /// the JWT-only form AP2's samples use.
+    /// Whether this receipt refers to `chain`. Uses `presentation_id` when the
+    /// receipt has one, so a malleated encoding of the same presentation still
+    /// matches; otherwise AP2's reference, in its spec or sample form.
     pub fn matches(&self, chain: &str) -> bool {
+        if let Some(id) = &self.presentation_id {
+            return presentation_id(chain).is_ok_and(|p| &p == id);
+        }
         reference_for(chain).is_ok_and(|r| r == self.reference)
             || jwt_only_reference(chain).is_ok_and(|r| r == self.reference)
     }
@@ -164,6 +188,8 @@ impl Receipt {
         p.insert("iat".into(), json!(self.iat));
         p.insert("reference".into(), json!(self.reference));
         for (name, value) in [
+            ("mandate_id", &self.mandate_id),
+            ("presentation_id", &self.presentation_id),
             ("method", &self.method),
             ("task_id", &self.task_id),
             ("purpose", &self.purpose),
@@ -220,6 +246,8 @@ impl Receipt {
             iat,
             outcome,
             reference: required("reference")?,
+            mandate_id: text("mandate_id"),
+            presentation_id: text("presentation_id"),
             method: text("method"),
             task_id: text("task_id"),
             purpose: text("purpose"),
@@ -233,6 +261,17 @@ impl Receipt {
 /// its closing hop (JWT and disclosures).
 pub fn reference_for(chain: &str) -> Result<String, Error> {
     Ok(b64(&Sha256::digest(closing_segment(chain)?.as_bytes())))
+}
+
+/// A signature-independent ID for a presentation: the digest of its closing
+/// hop's signing input and disclosures.
+pub fn presentation_id(chain: &str) -> Result<String, Error> {
+    let closing = closing_segment(chain)?;
+    let (jwt, disclosures) = closing.split_once('~').unwrap_or((closing, ""));
+    let signing_input = jwt.rsplit_once('.').map_or(jwt, |(input, _)| input);
+    Ok(a2a_gov_mandate::sdjwt::digest(&format!(
+        "{signing_input}~{disclosures}"
+    )))
 }
 
 /// The reference AP2's sample code computes: the digest of the closing hop's

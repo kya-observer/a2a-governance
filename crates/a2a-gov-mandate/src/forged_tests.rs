@@ -43,7 +43,7 @@ fn verify_forged(typ: &str, with_cnf: bool) -> Error {
     let surface = SigningKey::generate();
     let agent = SigningKey::generate();
     let open = issue_open(
-        &obj(json!({ "vct": "v", "cnf": { "jwk": agent.public_jwk().to_value() } })),
+        &obj(json!({ "vct": "v", "cnf": { "jwk": agent.public_jwk().to_value() }, "exp": NOW + 3600 })),
         &Disclosable::none(),
         &surface,
     )
@@ -79,7 +79,7 @@ fn a_delegation_typed_hop_without_cnf_is_rejected() {
     let surface = SigningKey::generate();
     let agent = SigningKey::generate();
     let open = issue_open(
-        &obj(json!({ "vct": "v", "cnf": { "jwk": agent.public_jwk().to_value() } })),
+        &obj(json!({ "vct": "v", "cnf": { "jwk": agent.public_jwk().to_value() }, "exp": NOW + 3600 })),
         &Disclosable::none(),
         &surface,
     )
@@ -124,13 +124,19 @@ fn a_digest_referenced_twice_is_rejected() {
 }
 
 #[test]
-fn decoy_digests_are_ignored() {
+fn withheld_or_decoy_digests_are_refused() {
+    // A withheld disclosure and a decoy look the same to a verifier. Either could
+    // hide a constraint, so this profile accepts neither.
     let d = disclosure(json!(["s", "a", 1]));
-    let payload = obj(
-        json!({ "_sd": [digest(&d), digest("decoy")], "list": [{ "...": digest("decoy2") }, 2] }),
+    let payload = obj(json!({ "_sd": [digest(&d), digest("decoy")] }));
+    assert!(matches!(resolve(payload, &[&d]), Err(Error::Disclosure(_))));
+    let payload = obj(json!({ "list": [{ "...": digest("decoy2") }, 2] }));
+    assert!(matches!(resolve(payload, &[]), Err(Error::Disclosure(_))));
+    let payload = obj(json!({ "_sd": [digest(&d)], "list": [2] }));
+    assert_eq!(
+        Value::Object(resolve(payload, &[&d]).unwrap()),
+        json!({ "a": 1, "list": [2] })
     );
-    let resolved = resolve(payload, &[&d]).unwrap();
-    assert_eq!(Value::Object(resolved), json!({ "a": 1, "list": [2] }));
 }
 
 #[test]

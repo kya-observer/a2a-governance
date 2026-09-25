@@ -20,6 +20,16 @@ pub fn digest(disclosure: &str) -> String {
     b64::encode(Sha256::digest(disclosure.as_bytes()))
 }
 
+/// A hop's stable identifier: the digest of its JWS signing input
+/// (`header.payload`), leaving out the signature. ECDSA signatures are
+/// malleable (`s` → `n − s` still verifies), so an ID that covered the
+/// signature would let anyone mint a second ID for the same mandate and escape
+/// use counting and revocation.
+pub fn hop_id(jwt: &str) -> String {
+    let signing_input = jwt.rsplit_once('.').map_or(jwt, |(input, _)| input);
+    digest(signing_input)
+}
+
 /// A decoded disclosure: `[salt, name, value]` for an object property, or
 /// `[salt, value]` for an array element.
 #[derive(Debug, Clone, PartialEq)]
@@ -192,12 +202,22 @@ pub(crate) fn resolve(
         by_digest,
         seen: HashSet::new(),
         used: 0,
+        withheld: 0,
     };
     resolver.object(&mut payload)?;
     if resolver.used != disclosures.len() {
         return Err(Error::Disclosure(
             "disclosure not referenced by the payload".into(),
         ));
+    }
+    // The holder chooses which disclosures to forward, and signs the next hop
+    // over its choice, so sd_hash can't reveal a withheld constraint or `exp`.
+    // This profile therefore requires every digest to be disclosed (no decoys).
+    if resolver.withheld > 0 {
+        return Err(Error::Disclosure(format!(
+            "{} disclosure(s) withheld; every disclosure must be presented",
+            resolver.withheld
+        )));
     }
     Ok(payload)
 }
@@ -206,6 +226,7 @@ struct Resolver {
     by_digest: HashMap<String, Disclosure>,
     seen: HashSet<String>,
     used: usize,
+    withheld: usize,
 }
 
 impl Resolver {
@@ -216,6 +237,8 @@ impl Resolver {
         let found = self.by_digest.remove(digest);
         if found.is_some() {
             self.used += 1;
+        } else {
+            self.withheld += 1;
         }
         Ok(found)
     }

@@ -30,4 +30,4 @@ pub use error::Error;
 pub use issue::{issue_open, join, present};
 pub use jwk::PublicJwk;
 pub use keys::SigningKey;
-pub use sdjwt::Disclosable;
+pub use sdjwt::{Disclosable, hop_id};

@@ -36,17 +36,13 @@ fn chain() -> String {
 }
 
 fn success(chain: &str) -> Receipt {
-    Receipt::new(
-        "https://verifier.example.org",
-        NOW,
-        Outcome::Success,
-        reference_for(chain).unwrap(),
-    )
-    .with_method("SendMessage")
-    .with_task_id("task-1")
-    .with_purpose("dpv:ServiceProvision")
-    .with_released(["title", "published"])
-    .unwrap()
+    Receipt::for_chain("https://verifier.example.org", NOW, Outcome::Success, chain)
+        .unwrap()
+        .with_method("SendMessage")
+        .with_task_id("task-1")
+        .with_purpose("dpv:ServiceProvision")
+        .with_released(["title", "published"])
+        .unwrap()
 }
 
 #[test]
@@ -208,4 +204,75 @@ fn malformed_receipts_are_rejected() {
 fn base64_url(bytes: &[u8]) -> String {
     use base64::Engine;
     base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(bytes)
+}
+
+// --- Signature malleability (review, 2026-09-25) ---------------------------------------
+
+fn flip_s(jwt: &str) -> String {
+    const N: [u8; 32] = [
+        0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+        0xff, 0xbc, 0xe6, 0xfa, 0xad, 0xa7, 0x17, 0x9e, 0x84, 0xf3, 0xb9, 0xca, 0xc2, 0xfc, 0x63,
+        0x25, 0x51,
+    ];
+    use base64::Engine;
+    let (input, sig) = jwt.rsplit_once('.').unwrap();
+    let mut bytes = base64::engine::general_purpose::URL_SAFE_NO_PAD
+        .decode(sig)
+        .unwrap();
+    let mut borrow = 0i16;
+    for i in (0..32).rev() {
+        let d = i16::from(N[i]) - i16::from(bytes[32 + i]) - borrow;
+        bytes[32 + i] = u8::try_from(d.rem_euclid(256)).unwrap();
+        borrow = i16::from(d < 0);
+    }
+    format!(
+        "{input}.{}",
+        base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(bytes)
+    )
+}
+
+fn malleate_closing(chain: &str) -> String {
+    let (head, closing) = chain.rsplit_once("~~").unwrap();
+    let (jwt, rest) = closing.split_once('~').unwrap();
+    format!("{head}~~{}~{rest}", flip_s(jwt))
+}
+
+#[test]
+fn receipts_identify_presentations_independently_of_the_signature_encoding() {
+    let chain = chain();
+    let twin = malleate_closing(&chain);
+    assert_ne!(chain, twin);
+    // AP2's reference covers the signature, so it differs between twins...
+    assert_ne!(
+        reference_for(&chain).unwrap(),
+        reference_for(&twin).unwrap()
+    );
+    // ...but the IDs a receipt is matched and keyed on don't.
+    assert_eq!(
+        a2a_gov_receipt::presentation_id(&chain).unwrap(),
+        a2a_gov_receipt::presentation_id(&twin).unwrap()
+    );
+    let receipt = success(&chain);
+    assert!(receipt.matches(&twin));
+    assert!(!receipt.matches(&self::chain()));
+}
+
+#[test]
+fn receipts_carry_mandate_and_presentation_ids() {
+    let chain = chain();
+    let key = SigningKey::generate();
+    let payload = Receipt::decode_unverified(&success(&chain).sign(&key)).unwrap();
+    let root_jwt = chain.split('~').next().unwrap();
+    assert_eq!(
+        payload["mandate_id"],
+        json!(a2a_gov_mandate::hop_id(root_jwt))
+    );
+    assert_eq!(
+        payload["presentation_id"],
+        json!(a2a_gov_receipt::presentation_id(&chain).unwrap())
+    );
+    assert_eq!(
+        Receipt::verify(&success(&chain).sign(&key), &key.public_jwk()).unwrap(),
+        success(&chain)
+    );
 }

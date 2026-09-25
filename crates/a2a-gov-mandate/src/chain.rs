@@ -2,7 +2,7 @@
 
 use serde_json::{Map, Value};
 
-use crate::sdjwt::{self, digest};
+use crate::sdjwt::{self, digest, hop_id};
 use crate::{Error, PublicJwk, jws};
 
 /// Largest chain accepted, checked before any parsing.
@@ -41,14 +41,14 @@ impl VerifyOptions {
     }
 
     /// Tolerance for `exp`, `nbf` and `iat` checks, in seconds.
-    pub fn clock_skew(mut self, seconds: i64) -> Self {
-        self.clock_skew = seconds;
+    pub fn clock_skew(mut self, seconds: u32) -> Self {
+        self.clock_skew = i64::from(seconds);
         self
     }
 
     /// Maximum age of the closing hop's `iat`, in seconds.
-    pub fn max_closing_age(mut self, seconds: i64) -> Self {
-        self.max_closing_age = seconds;
+    pub fn max_closing_age(mut self, seconds: u32) -> Self {
+        self.max_closing_age = i64::from(seconds);
         self
     }
 }
@@ -75,9 +75,10 @@ pub struct VerifiedHop {
 }
 
 impl VerifiedHop {
-    /// A stable identifier: the digest of the hop's signed JWT, so every
-    /// presentation of one open mandate shares the root's ID. Verifiers key use
-    /// counts and revocations on it.
+    /// A stable identifier ([`crate::sdjwt::hop_id`]): the digest of the hop's
+    /// signing input, without the signature, so every presentation of one open
+    /// mandate, and every malleated twin of it, shares the root's ID. Verifiers
+    /// key use counts and revocations on it.
     pub fn id(&self) -> &str {
         &self.id
     }
@@ -103,7 +104,14 @@ impl VerifiedHop {
     }
 }
 
-/// A chain whose signatures, bindings, keys, times, audience and nonce all checked out.
+/// A chain whose structure and cryptography checked out: signatures, hop
+/// bindings, key binding, required claims, times, audience and nonce.
+///
+/// Verification does **not** evaluate constraints. A caller must apply the
+/// constraints of **every** authorizing hop (the open mandate and each
+/// delegation), not just [`VerifiedChain::open`]: a delegation can carry any
+/// value, including a looser one, and only applying all of them makes a
+/// delegation narrow the mandate. Nonce single use is also the caller's job.
 #[derive(Debug, Clone)]
 pub struct VerifiedChain {
     hops: Vec<VerifiedHop>,
@@ -187,8 +195,11 @@ fn split(chain: &str) -> Result<Vec<Segment<'_>>, Error> {
 /// Verifies a presentation chain: an open mandate, optional delegations, and a
 /// closing hop addressed to this verifier.
 ///
-/// `root_key` maps the open mandate's JWS header (e.g. its `kid`) to the
-/// trusted surface's public key, or `None` if the issuer isn't trusted.
+/// `root_key` maps the open mandate's JWS header to the trusted surface's
+/// public key, or `None` if the issuer isn't trusted. The header is
+/// **unverified** when it's called: look the key up by `kid` (or use a fixed
+/// key) in the verifier's own configuration, and never take a key from the
+/// header itself (`jwk`, `jku`, `x5c`, `x5u`).
 pub fn verify_chain(
     chain: &str,
     root_key: impl Fn(&Map<String, Value>) -> Option<PublicJwk>,
@@ -252,12 +263,12 @@ pub fn verify_chain(
             if mandate.get("vct") != hops[0].mandate.get("vct") {
                 return Err(Error::Chain("mandate type changed along the chain".into()));
             }
-        } else if !mandate.get("vct").is_some_and(Value::is_string) {
-            return Err(Error::Chain("open mandate has no vct".into()));
+        } else {
+            check_open_mandate(&mandate)?;
         }
 
         hops.push(VerifiedHop {
-            id: digest(seg.jwt),
+            id: hop_id(seg.jwt),
             kind,
             header: verified.header,
             claims,
@@ -265,6 +276,25 @@ pub fn verify_chain(
         });
     }
     Ok(VerifiedChain { hops })
+}
+
+/// The open mandate must say what it is, whom it's bound to, and when it ends.
+/// Without `exp` a mandate would never expire.
+fn check_open_mandate(mandate: &Map<String, Value>) -> Result<(), Error> {
+    if !mandate.get("vct").is_some_and(Value::is_string) {
+        return Err(Error::Chain("open mandate has no vct".into()));
+    }
+    if !mandate
+        .get("cnf")
+        .and_then(|c| c.get("jwk"))
+        .is_some_and(Value::is_object)
+    {
+        return Err(Error::Chain("open mandate has no cnf.jwk".into()));
+    }
+    if !mandate.get("exp").is_some_and(|e| e.as_i64().is_some()) {
+        return Err(Error::Chain("open mandate has no exp".into()));
+    }
+    Ok(())
 }
 
 fn bound_key(prev: &VerifiedHop) -> Result<PublicJwk, Error> {

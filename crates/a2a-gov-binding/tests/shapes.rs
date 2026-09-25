@@ -251,3 +251,34 @@ fn message_shapes_use_protojson_field_names() {
         }
     }
 }
+
+#[test]
+fn pending_requests_need_every_field() {
+    for field in ["challengeId", "aud", "nonce"] {
+        let mut status = task_status("m", "t", "c", "x", &AuthState::Pending(request()));
+        status["message"]["metadata"][EXTENSION_URI][field] = json!("");
+        assert!(
+            matches!(read_status(&status), Err(Error::Invalid(_))),
+            "{field}"
+        );
+    }
+}
+
+#[test]
+fn unknown_fields_in_our_metadata_are_refused() {
+    let mut message = continuation_message(
+        "m",
+        "t",
+        "c",
+        "x",
+        &PresentationMeta {
+            presentation: "a~~b~".into(),
+            nonce: "n".into(),
+        },
+    );
+    message["metadata"][EXTENSION_URI]["presentationOverride"] = json!("x");
+    assert!(matches!(
+        read_presentation(&message),
+        Err(Error::Invalid(_))
+    ));
+}

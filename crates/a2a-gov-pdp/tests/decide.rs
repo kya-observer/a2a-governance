@@ -163,7 +163,7 @@ fn a_call_inside_the_mandate_passes() {
             assert_eq!(grant.purpose.as_deref(), Some("dpv:ServiceProvision"));
             assert_eq!(grant.release, Release::AnswerOnly);
             let jwt = w.open.split('~').next().unwrap();
-            assert_eq!(grant.mandate_id, a2a_gov_mandate::sdjwt::digest(jwt));
+            assert_eq!(grant.mandate_id, a2a_gov_mandate::hop_id(jwt));
         }
         other => panic!("{other:?}"),
     }
@@ -398,9 +398,8 @@ fn a_refused_call_does_not_use_up_the_mandate() {
     }
     assert!(matches!(decide(&w, &call()), Decision::Pass(_)));
     assert_eq!(
-        w.uses.count(&a2a_gov_mandate::sdjwt::digest(
-            w.open.split('~').next().unwrap()
-        )),
+        w.uses
+            .count(&a2a_gov_mandate::hop_id(w.open.split('~').next().unwrap())),
         1
     );
 }
@@ -494,7 +493,7 @@ fn use_limits_on_a_delegation_count_separately_and_atomically() {
     assert!(matches!(via_sub(), Decision::Pass(_)));
     assert_eq!(denied(&via_sub()), DenyReason::InvalidMandate);
     // The refused second call must not have spent one of the open mandate's uses.
-    let open_id = a2a_gov_mandate::sdjwt::digest(w.open.split('~').next().unwrap());
+    let open_id = a2a_gov_mandate::hop_id(w.open.split('~').next().unwrap());
     assert_eq!(w.uses.count(&open_id), 1);
 }
 
@@ -503,7 +502,7 @@ fn use_limits_on_a_delegation_count_separately_and_atomically() {
 #[test]
 fn revoked_mandates_are_refused() {
     let w = world();
-    let open_id = a2a_gov_mandate::sdjwt::digest(w.open.split('~').next().unwrap());
+    let open_id = a2a_gov_mandate::hop_id(w.open.split('~').next().unwrap());
     w.revocations.revoke(&open_id);
     assert_eq!(denied(&decide(&w, &call())), DenyReason::InvalidMandate);
 }
@@ -512,9 +511,8 @@ fn revoked_mandates_are_refused() {
 fn a_revoked_delegation_is_refused_even_though_the_open_mandate_is_live() {
     let w = world();
     let (hop, sub) = delegate(&w, json!([]));
-    w.revocations.revoke(&a2a_gov_mandate::sdjwt::digest(
-        hop.split('~').next().unwrap(),
-    ));
+    w.revocations
+        .revoke(&a2a_gov_mandate::hop_id(hop.split('~').next().unwrap()));
     let (chain, nonce) = presentation_with(&w, &[&w.open, &hop], &sub, closed_for(&call()));
     let d = w.engine.decide(
         Some(Presentation {
@@ -674,4 +672,71 @@ fn a_zero_use_limit_is_reported_as_malformed_not_spent() {
         }
         other => panic!("{other:?}"),
     }
+}
+
+#[test]
+fn a_delegation_cannot_raise_the_roots_use_limit() {
+    // Review finding: a delegation may *say* anything; every hop's limit applies.
+    let w = world_with(json!([{ "type": "access.max_uses", "max_uses": 1 }]));
+    let (hop, sub) = delegate(
+        &w,
+        json!([{ "type": "access.max_uses", "max_uses": 1_000_000 }]),
+    );
+    let via_sub = || {
+        let (chain, nonce) = presentation_with(&w, &[&w.open, &hop], &sub, closed_for(&call()));
+        w.engine.decide(
+            Some(Presentation {
+                chain: &chain,
+                aud: AUD,
+                nonce: &nonce,
+            }),
+            &call(),
+            NOW,
+        )
+    };
+    assert!(matches!(via_sub(), Decision::Pass(_)));
+    assert_eq!(denied(&via_sub()), DenyReason::InvalidMandate);
+}
+
+#[test]
+fn a_malleated_open_mandate_shares_its_use_count() {
+    // Review finding: rewriting s to n - s must not buy extra uses.
+    let w = world_with(json!([{ "type": "access.max_uses", "max_uses": 1 }]));
+    assert!(matches!(decide(&w, &call()), Decision::Pass(_)));
+    let (jwt, rest) = w.open.split_once('~').unwrap();
+    let twin = format!("{}~{rest}", flip_s(jwt));
+    let (chain, nonce) = presentation_with(&w, &[&twin], &w.agent, closed_for(&call()));
+    let d = w.engine.decide(
+        Some(Presentation {
+            chain: &chain,
+            aud: AUD,
+            nonce: &nonce,
+        }),
+        &call(),
+        NOW,
+    );
+    assert_eq!(denied(&d), DenyReason::InvalidMandate);
+}
+
+fn flip_s(jwt: &str) -> String {
+    const N: [u8; 32] = [
+        0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+        0xff, 0xbc, 0xe6, 0xfa, 0xad, 0xa7, 0x17, 0x9e, 0x84, 0xf3, 0xb9, 0xca, 0xc2, 0xfc, 0x63,
+        0x25, 0x51,
+    ];
+    use base64::Engine;
+    let (input, sig) = jwt.rsplit_once('.').unwrap();
+    let mut bytes = base64::engine::general_purpose::URL_SAFE_NO_PAD
+        .decode(sig)
+        .unwrap();
+    let mut borrow = 0i16;
+    for i in (0..32).rev() {
+        let d = i16::from(N[i]) - i16::from(bytes[32 + i]) - borrow;
+        bytes[32 + i] = u8::try_from(d.rem_euclid(256)).unwrap();
+        borrow = i16::from(d < 0);
+    }
+    format!(
+        "{input}.{}",
+        base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(bytes)
+    )
 }

@@ -20,7 +20,7 @@ use std::sync::Arc;
 
 pub use a2a_gov_extension::errors::{ChallengeReason, DenyReason};
 use a2a_gov_mandate::{HopKind, PublicJwk, VerifiedChain, VerifyOptions, verify_chain};
-use a2a_gov_receipt::{Outcome, Receipt, reference_for};
+use a2a_gov_receipt::{Outcome, Receipt};
 use serde_json::{Map, Value};
 
 use crate::constraints::{Evaluation, evaluate};
@@ -114,7 +114,7 @@ impl Decision {
     /// The Mandate Receipt for this decision, or `None` when no chain was
     /// presented (there is nothing to refer to).
     pub fn receipt(&self, iss: &str, now: i64, chain: Option<&str>) -> Option<Receipt> {
-        let reference = reference_for(chain?).ok()?;
+        let chain = chain?;
         let (outcome, purpose) = match self {
             Self::Pass(grant) => (Outcome::Success, grant.purpose.as_deref()),
             Self::Deny { reason, detail } => (
@@ -132,7 +132,7 @@ impl Decision {
                 None,
             ),
         };
-        let receipt = Receipt::new(iss, now, outcome, reference);
+        let receipt = Receipt::for_chain(iss, now, outcome, chain).ok()?;
         Some(match purpose {
             Some(p) => receipt.with_purpose(p),
             None => receipt,
@@ -175,8 +175,8 @@ pub struct Engine {
     nonces: Arc<dyn Nonces>,
     revocations: Arc<dyn Revocations>,
     uses: Arc<dyn UseCounter>,
-    clock_skew: i64,
-    max_closing_age: i64,
+    clock_skew: u32,
+    max_closing_age: u32,
 }
 
 impl Engine {
