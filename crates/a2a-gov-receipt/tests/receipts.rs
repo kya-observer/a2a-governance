@@ -187,6 +187,8 @@ fn malformed_receipts_are_rejected() {
         json!({ "iat": NOW, "status": "Success", "reference": "abc" }), // no iss
         json!({ "iss": "v", "status": "Success", "reference": "abc" }), // no iat
         json!({ "iss": "v", "iat": NOW, "status": "Success" }),         // no reference
+        json!({ "iss": "v", "iat": NOW, "status": "Success", "result": "error", "reference": "abc" }), // ambiguous
+        json!({ "iss": "v", "iat": NOW, "status": "Success", "reference": "abc", "released": ["title=secret"] }), // a value
     ] {
         let jws = a2a_gov_mandate::jws::sign(
             &obj(json!({ "alg": "ES256" })),
