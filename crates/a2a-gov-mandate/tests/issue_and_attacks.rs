@@ -305,12 +305,10 @@ fn oversized_input_is_rejected_before_parsing() {
     ));
 }
 
-#[test]
-fn overlong_chains_are_rejected() {
-    let f = fixture();
+fn chain_with_delegations(f: &Fixture, delegations: usize) -> String {
     let mut segments = vec![f.open.clone()];
     let mut holder = f.agent.clone();
-    for i in 0..a2a_gov_mandate::MAX_HOPS {
+    for i in 0..delegations {
         let next = SigningKey::generate();
         let item = obj(json!({
             "vct": "mandate.access.1",
@@ -329,11 +327,40 @@ fn overlong_chains_are_rejected() {
         segments.push(hop);
         holder = next;
     }
+    let closing = present(
+        segments.last().unwrap(),
+        &closed_mandate(),
+        &Disclosable::none(),
+        &holder,
+        AUD,
+        NONCE,
+        NOW,
+    )
+    .unwrap();
+    segments.push(closing);
     let refs: Vec<&str> = segments.iter().map(String::as_str).collect();
-    assert!(matches!(
-        verify(&f, &join(&refs)).unwrap_err(),
-        Error::Chain(_)
-    ));
+    join(&refs)
+}
+
+#[test]
+fn chains_up_to_the_hop_limit_verify() {
+    let f = fixture();
+    let chain = chain_with_delegations(&f, a2a_gov_mandate::MAX_HOPS - 2);
+    assert_eq!(
+        verify(&f, &chain).unwrap().hops().len(),
+        a2a_gov_mandate::MAX_HOPS
+    );
+}
+
+#[test]
+fn overlong_chains_are_rejected() {
+    let f = fixture();
+    let chain = chain_with_delegations(&f, a2a_gov_mandate::MAX_HOPS - 1);
+    let err = verify(&f, &chain).unwrap_err();
+    assert_eq!(
+        err,
+        Error::Chain(format!("more than {} hops", a2a_gov_mandate::MAX_HOPS))
+    );
 }
 
 #[test]

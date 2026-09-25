@@ -75,11 +75,25 @@ fn a_closing_typed_hop_carrying_cnf_is_rejected() {
 
 #[test]
 fn a_delegation_typed_hop_without_cnf_is_rejected() {
-    // Last segment, so it also fails as "chain ends in a delegation"; either way it's refused.
-    assert!(matches!(
-        verify_forged("kb+sd-jwt+kb", false),
-        Error::Chain(_)
-    ));
+    // Mid-chain, so "chain ends in a delegation" can't be what rejects it.
+    let surface = SigningKey::generate();
+    let agent = SigningKey::generate();
+    let open = issue_open(
+        &obj(json!({ "vct": "v", "cnf": { "jwk": agent.public_jwk().to_value() } })),
+        &Disclosable::none(),
+        &surface,
+    )
+    .unwrap();
+    let bad = hop_with_typ(&open, &obj(json!({ "vct": "v" })), "kb+sd-jwt+kb", &agent);
+    let closing = hop_with_typ(&bad, &obj(json!({ "vct": "v" })), "kb+sd-jwt", &agent);
+    let key = surface.public_jwk();
+    let err = verify_chain(
+        &join(&[&open, &bad, &closing]),
+        move |_| Some(key.clone()),
+        &VerifyOptions::new("aud", "nonce", NOW),
+    )
+    .unwrap_err();
+    assert_eq!(err, Error::Chain("delegation lacks cnf".into()));
 }
 
 #[test]
