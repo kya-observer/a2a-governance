@@ -64,3 +64,20 @@ fn a_rehashed_forgery_still_breaks_the_next_link() {
     entries[2].hash = a2a_gov_receipt::log::entry_hash(2, &entries[2].prev, "forged");
     assert_eq!(verify(&entries), Err(LogError::PrevMismatch { seq: 3 }));
 }
+
+#[test]
+fn a_renumbered_last_entry_is_detected() {
+    // Rehashing makes prev and hash consistent; only the sequence check catches it.
+    let mut entries = log_of(4).entries().to_vec();
+    let last = entries.last_mut().unwrap();
+    last.seq = 9;
+    last.hash = a2a_gov_receipt::log::entry_hash(9, &last.prev, &last.receipt);
+    assert_eq!(verify(&entries), Err(LogError::Sequence { seq: 3 }));
+}
+
+#[test]
+fn an_entry_hash_commits_to_its_position() {
+    // So a head also commits to how long the log is.
+    use a2a_gov_receipt::log::entry_hash;
+    assert_ne!(entry_hash(0, "", "r"), entry_hash(1, "", "r"));
+}
