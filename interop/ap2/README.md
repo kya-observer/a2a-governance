@@ -11,5 +11,5 @@ uv run python gen_ap2_vectors.py  # mint vectors with AP2 for the Rust tests
 ```
 
 Note that AP2's SDK appends presentation tokens to
-`.venv/lib/python*/site-packages/ap2/.logs/mandate_operations.log`. They are test tokens
+`.venv/lib/python3.x/.logs/mandate_operations.log`. They are test tokens
 here, but don't run the SDK this way with real credentials.

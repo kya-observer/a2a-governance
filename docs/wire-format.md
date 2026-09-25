@@ -84,10 +84,14 @@ Found while building the interop suite. None of them blocks interoperability.
    agent still verifies. In our probes the forged values didn't reach the verified
    output, so this is a conformance gap with RFC 9901 §7.1, not a demonstrated exploit.
    Duplicate disclosures *are* rejected.
-3. **Presentation tokens are logged to disk.** `ap2/sdk/mandate.py` appends every
-   presentation, including bound tokens, to `site-packages/ap2/.logs/mandate_operations.log`.
-4. **`MandateClient.present()` extends only one hop.** It can't take an already joined
-   chain. Multi-hop chains are built with `kb_sd_jwt.create` and joined by hand, as AP2's
+3. **Presentations are logged to disk.** `ap2/sdk/mandate.py` appends every
+   presentation (the closing KB-SD-JWT and its disclosures) to
+   `<python prefix>/lib/python3.x/.logs/mandate_operations.log`. The file is created
+   `0644`, and there is no switch to turn it off. The presentations are bound to one
+   audience and nonce, which limits replay, but they carry mandate content.
+4. **`MandateClient.present()` extends only one hop** (reported upstream as
+   [#353](https://github.com/google-agentic-commerce/AP2/issues/353)). It can't take an
+   already joined chain. Multi-hop chains are built with `kb_sd_jwt.create` and joined by hand, as AP2's
    own `chain_tests.py` does.
 5. **The receipt field differs between spec and SDK.** The spec's Mandate Receipt has
    `result`; the SDK's `ReceiptClient` writes `status`.
