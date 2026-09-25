@@ -1,0 +1,17 @@
+[project]
+name = "a2a-gov-interop-ap2"
+version = "0.1.0"
+description = "Cross-verification between a2a-governance mandates and Google's AP2 Python SDK"
+requires-python = ">=3.12,<3.14"
+license = "Apache-2.0"
+dependencies = [
+    # Google's AP2 SDK, pinned by commit. The PyPI package named "ap2" is unrelated.
+    "ap2 @ git+https://github.com/google-agentic-commerce/AP2@e1ea56db72a6385bce3e5c1112b3a56ce60acb43",
+    "pytest>=9",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.uv]
+package = false
