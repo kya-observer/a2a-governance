@@ -60,6 +60,11 @@ jobs:
           (cd interop/ap2 && uv run python gen_ap2_vectors.py && uv run python gen_ap2_receipts.py)
           cargo test -q -p a2a-gov-mandate --test ap2_interop
           cargo test -q -p a2a-gov-receipt --test ap2_interop
+      - name: Agent Card signatures and RFC 8785 agree with the a2a-sdk, both ways
+        run: |
+          cargo run -q -p a2a-gov-card --example gen_card_vectors
+          (cd interop/a2a && uv sync --python 3.13 && uv run python gen_card_vectors.py && uv run python gen_jcs_vectors.py)
+          cargo test -q -p a2a-gov-card
       - name: a2a-sdk parses the extension's A2A shapes, and they survive its round trip
         run: |
           cargo run -q -p a2a-gov-binding --example gen_binding_vectors

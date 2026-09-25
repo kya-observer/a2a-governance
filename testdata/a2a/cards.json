@@ -1,0 +1,181 @@
+{
+  "description": "Agent Cards signed by a2a-sdk 1.1.5. Test keys only.",
+  "vectors": [
+    {
+      "name": "plain",
+      "card": {
+        "name": "Example vault agent",
+        "description": "Answers questions about a reading history",
+        "supportedInterfaces": [
+          {
+            "url": "https://vault.example.org/a2a",
+            "protocolBinding": "JSONRPC",
+            "protocolVersion": "1.0"
+          }
+        ],
+        "version": "0.1.0",
+        "capabilities": {
+          "streaming": false,
+          "extensions": [
+            {
+              "uri": "https://example.org/ext/v1",
+              "required": true,
+              "params": {
+                "n": 3.0,
+                "mandateFormats": [
+                  "dc+sd-jwt"
+                ]
+              }
+            }
+          ]
+        },
+        "defaultInputModes": [
+          "text/plain"
+        ],
+        "defaultOutputModes": [
+          "text/plain"
+        ],
+        "skills": [
+          {
+            "id": "reading",
+            "name": "Reading",
+            "description": "Answers from reading history",
+            "tags": [
+              "reading"
+            ]
+          }
+        ],
+        "signatures": [
+          {
+            "protected": "eyJhbGciOiJFUzI1NiIsImprdSI6bnVsbCwia2lkIjoia2V5LXBsYWluIiwidHlwIjoiSk9TRSJ9",
+            "signature": "-x7JiJ2s5SxDev9U3x0sbyyN-Qvtgc2uPvmETtmF1_ahp4FvRgAbDEFIqK79wseezxWx3mZV7XRNvQcFydkwgg"
+          }
+        ]
+      },
+      "kid": "key-plain",
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "x": "p6j9SOu8fkrq_BiuNQmt5uURSvtcMIHDgssUYN0WN_k",
+        "y": "GtiNizVwJQooOkYUunSDKh46tohwOfDhT1t34zPTkDE"
+      }
+    },
+    {
+      "name": "empty-description",
+      "card": {
+        "name": "Example vault agent",
+        "supportedInterfaces": [
+          {
+            "url": "https://vault.example.org/a2a",
+            "protocolBinding": "JSONRPC",
+            "protocolVersion": "1.0"
+          }
+        ],
+        "version": "0.1.0",
+        "capabilities": {
+          "streaming": false,
+          "extensions": [
+            {
+              "uri": "https://example.org/ext/v1",
+              "required": true,
+              "params": {
+                "n": 3.0,
+                "mandateFormats": [
+                  "dc+sd-jwt"
+                ]
+              }
+            }
+          ]
+        },
+        "defaultInputModes": [
+          "text/plain"
+        ],
+        "defaultOutputModes": [
+          "text/plain"
+        ],
+        "skills": [
+          {
+            "id": "reading",
+            "name": "Reading",
+            "description": "Answers from reading history",
+            "tags": [
+              "reading"
+            ]
+          }
+        ],
+        "signatures": [
+          {
+            "protected": "eyJhbGciOiJFUzI1NiIsImprdSI6bnVsbCwia2lkIjoia2V5LWVtcHR5LWRlc2NyaXB0aW9uIiwidHlwIjoiSk9TRSJ9",
+            "signature": "QKAP9046qKieG5QaLIAHiX63SdDKK1T73ki2lOhgGb7zV_b0zSF0i5TYaRpd_W3crKfV3xPG4MmnSaN7fF0xHw"
+          }
+        ]
+      },
+      "kid": "key-empty-description",
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "x": "MdBEvEI6ZZKZLNhx8ZdjeGMknza8omt960DhjQQdLBk",
+        "y": "Dd3Kc-fKISvbsNI3dmw6nU8Q-BIow1D4iDdSPI0afV0"
+      }
+    },
+    {
+      "name": "unicode",
+      "card": {
+        "name": "Agent für Lesehistorie €",
+        "description": "Answers questions about a reading history",
+        "supportedInterfaces": [
+          {
+            "url": "https://vault.example.org/a2a",
+            "protocolBinding": "JSONRPC",
+            "protocolVersion": "1.0"
+          }
+        ],
+        "version": "0.1.0",
+        "capabilities": {
+          "streaming": false,
+          "extensions": [
+            {
+              "uri": "https://example.org/ext/v1",
+              "required": true,
+              "params": {
+                "n": 3.0,
+                "mandateFormats": [
+                  "dc+sd-jwt"
+                ]
+              }
+            }
+          ]
+        },
+        "defaultInputModes": [
+          "text/plain"
+        ],
+        "defaultOutputModes": [
+          "text/plain"
+        ],
+        "skills": [
+          {
+            "id": "reading",
+            "name": "Reading",
+            "description": "Answers from reading history",
+            "tags": [
+              "reading"
+            ]
+          }
+        ],
+        "signatures": [
+          {
+            "protected": "eyJhbGciOiJFUzI1NiIsImprdSI6bnVsbCwia2lkIjoia2V5LXVuaWNvZGUiLCJ0eXAiOiJKT1NFIn0",
+            "signature": "U1mE1omKNNPga9-8OnVbZXhTNgik1CnRoyoYkSqL58tYIXMKegZqf_N5Occ5tQwPUOEOMZdB8CUs-Uwls9diNQ"
+          }
+        ]
+      },
+      "kid": "key-unicode",
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "x": "IL5Lx21oTyZk3Km44CZHtk45fD_3yaIUjQIT8_IfklA",
+        "y": "DOzIimmO5OsMkEOl3eXNv2nBBAP7KCeDJjUn__QrS_Q"
+      }
+    }
+  ]
+}

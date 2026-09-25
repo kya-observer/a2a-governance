@@ -26,6 +26,19 @@ pub fn sign(header: &Map<String, Value>, payload: &Map<String, Value>, key: &Sig
     format!("{signing_input}.{}", b64::encode(sig))
 }
 
+/// Signs `payload` bytes exactly as given (base64url-encoded, never
+/// re-serialized). For payloads whose byte form is itself specified, such as
+/// the RFC 8785 canonical form of a signed Agent Card.
+pub fn sign_bytes(header: &Map<String, Value>, payload: &[u8], key: &SigningKey) -> String {
+    let signing_input = format!(
+        "{}.{}",
+        b64::encode(Value::Object(header.clone()).to_string()),
+        b64::encode(payload)
+    );
+    let sig = key.sign(signing_input.as_bytes());
+    format!("{signing_input}.{}", b64::encode(sig))
+}
+
 /// Decodes without checking the signature. Callers must [`verify`] before
 /// trusting anything in the result.
 pub fn decode(compact: &str) -> Result<Decoded, Error> {

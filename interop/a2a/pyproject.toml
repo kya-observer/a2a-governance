@@ -5,7 +5,7 @@ description = "Checks the extension's A2A message shapes with the official a2a-s
 requires-python = ">=3.12,<3.14"
 license = "Apache-2.0"
 dependencies = [
-    "a2a-sdk==1.1.5",
+    "a2a-sdk[signing]==1.1.5",
     "pytest>=9",
 ]
 
