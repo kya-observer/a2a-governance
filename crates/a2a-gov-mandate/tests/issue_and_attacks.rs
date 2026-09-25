@@ -383,3 +383,16 @@ fn an_agent_cannot_smuggle_disclosures_into_the_open_mandate() {
     let err = verify(&f, &join(&[&smuggled, &hop])).unwrap_err();
     assert!(matches!(err, Error::Disclosure(_)), "{err}");
 }
+
+#[test]
+fn hop_ids_are_stable_across_presentations_of_one_mandate() {
+    // Use counting and revocation key on these IDs, so two closing hops over the
+    // same open mandate must share its ID, and differ from each other.
+    let f = fixture();
+    let a = verify(&f, &join(&[&f.open, &closing(&f, closed_mandate(), NOW)])).unwrap();
+    let b = verify(&f, &join(&[&f.open, &closing(&f, closed_mandate(), NOW)])).unwrap();
+    assert_eq!(a.hops()[0].id(), b.hops()[0].id());
+    assert_ne!(a.hops()[1].id(), b.hops()[1].id());
+    let jwt = f.open.split('~').next().unwrap();
+    assert_eq!(a.hops()[0].id(), a2a_gov_mandate::sdjwt::digest(jwt));
+}

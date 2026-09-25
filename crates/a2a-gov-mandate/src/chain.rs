@@ -67,6 +67,7 @@ pub enum HopKind {
 /// One verified hop.
 #[derive(Debug, Clone)]
 pub struct VerifiedHop {
+    id: String,
     kind: HopKind,
     header: Map<String, Value>,
     claims: Map<String, Value>,
@@ -74,6 +75,13 @@ pub struct VerifiedHop {
 }
 
 impl VerifiedHop {
+    /// A stable identifier: the digest of the hop's signed JWT, so every
+    /// presentation of one open mandate shares the root's ID. Verifiers key use
+    /// counts and revocations on it.
+    pub fn id(&self) -> &str {
+        &self.id
+    }
+
     /// The hop's role.
     pub fn kind(&self) -> HopKind {
         self.kind
@@ -249,6 +257,7 @@ pub fn verify_chain(
         }
 
         hops.push(VerifiedHop {
+            id: digest(seg.jwt),
             kind,
             header: verified.header,
             claims,
