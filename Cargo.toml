@@ -12,6 +12,7 @@ repository = "https://github.com/kya-observer/a2a-governance"
 [workspace.dependencies]
 a2a-gov-extension = { path = "crates/a2a-gov-extension" }
 a2a-gov-mandate = { path = "crates/a2a-gov-mandate" }
+a2a-gov-receipt = { path = "crates/a2a-gov-receipt" }
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["preserve_order"] }
 thiserror = "2"

@@ -1,0 +1,107 @@
+{
+  "description": "Checkout receipts signed with Google's AP2 Python SDK (commit e1ea56d). Test keys only.",
+  "vectors": [
+    {
+      "receipt": "eyJhbGciOiAiRVMyNTYiLCAidHlwIjogIkpXVCIsICJraWQiOiAibWVyY2hhbnQtMSJ9.eyJzdGF0dXMiOiAiU3VjY2VzcyIsICJpc3MiOiAiaHR0cHM6Ly9tZXJjaGFudC5leGFtcGxlLm9yZyIsICJpYXQiOiAxNzkwMzUzNjc3LCAicmVmZXJlbmNlIjogInJlZi0wIiwgIm9yZGVyX2lkIjogIm9yZGVyLTAifQ.pasRG84rC_d5my_4m56wBofRk9GwMhKqQPujswUm8HUK0oI4fpENnyH9PTxbGtKFE6gwFKQ0mv6jRP0FTbE01A",
+      "verifier_jwk": {
+        "crv": "P-256",
+        "kid": "merchant-1",
+        "kty": "EC",
+        "x": "TzPpqIxEruthv2Bnt-EEM4Xw0Yc2p6TKCcf2hWmuTuc",
+        "y": "CUPhv4A2IO1uGg9KAT9iGEl28hfIdzG_3vreCgGNiqk"
+      },
+      "expected": {
+        "status": "Success",
+        "iss": "https://merchant.example.org",
+        "iat": 1790353677,
+        "reference": "ref-0",
+        "order_id": "order-0"
+      }
+    },
+    {
+      "receipt": "eyJhbGciOiAiRVMyNTYiLCAidHlwIjogIkpXVCIsICJraWQiOiAibWVyY2hhbnQtMSJ9.eyJzdGF0dXMiOiAiU3VjY2VzcyIsICJpc3MiOiAiaHR0cHM6Ly9tZXJjaGFudC5leGFtcGxlLm9yZyIsICJpYXQiOiAxNzkwMzUzNjc3LCAicmVmZXJlbmNlIjogInJlZi0xIiwgIm9yZGVyX2lkIjogIm9yZGVyLTEifQ.DNUq0l1FbfQLN-_1WZ3SJLISww3BW43EJWt_UFc-2orRsBsdjxwQGOqLaTPBL9i5neqob0WAe4-F41DE97Pu0g",
+      "verifier_jwk": {
+        "crv": "P-256",
+        "kid": "merchant-1",
+        "kty": "EC",
+        "x": "M4s8QVkHM-nd0L2M2CNuFzLsJTt5T8xObQr2PgWxzvk",
+        "y": "3SLWU9ODFBztk4AaRLCNgcVMru7R64PqYlapH7SjqNc"
+      },
+      "expected": {
+        "status": "Success",
+        "iss": "https://merchant.example.org",
+        "iat": 1790353677,
+        "reference": "ref-1",
+        "order_id": "order-1"
+      }
+    },
+    {
+      "receipt": "eyJhbGciOiAiRVMyNTYiLCAidHlwIjogIkpXVCIsICJraWQiOiAibWVyY2hhbnQtMSJ9.eyJzdGF0dXMiOiAiU3VjY2VzcyIsICJpc3MiOiAiaHR0cHM6Ly9tZXJjaGFudC5leGFtcGxlLm9yZyIsICJpYXQiOiAxNzkwMzUzNjc3LCAicmVmZXJlbmNlIjogInJlZi0yIiwgIm9yZGVyX2lkIjogIm9yZGVyLTIifQ.0qsV1oPX70NdKO17uCiSJvgzpC1EGkAPjqUEqVMpcofwhjjp_AwKePczRyxeLu617BahrWJYvs0s1lmETu8O7A",
+      "verifier_jwk": {
+        "crv": "P-256",
+        "kid": "merchant-1",
+        "kty": "EC",
+        "x": "BOx0ZNclsImTZCB0r2F8bzHKAybl0j3NRXyTCOom5NI",
+        "y": "JAM9_w-AR632XoQwAPGurWFnFvdp_1b1ukIR6oM35us"
+      },
+      "expected": {
+        "status": "Success",
+        "iss": "https://merchant.example.org",
+        "iat": 1790353677,
+        "reference": "ref-2",
+        "order_id": "order-2"
+      }
+    },
+    {
+      "receipt": "eyJhbGciOiAiRVMyNTYiLCAidHlwIjogIkpXVCIsICJraWQiOiAibWVyY2hhbnQtMSJ9.eyJzdGF0dXMiOiAiU3VjY2VzcyIsICJpc3MiOiAiaHR0cHM6Ly9tZXJjaGFudC5leGFtcGxlLm9yZyIsICJpYXQiOiAxNzkwMzUzNjc3LCAicmVmZXJlbmNlIjogInJlZi0zIiwgIm9yZGVyX2lkIjogIm9yZGVyLTMifQ.cZkBQ3oYhz4uY8hFlQ-XKriiBwzJSuZoDjgeO-K5xKCvdg-RqPc-bSt3J_sxrrEdA3zHkQhd8rrnF5DX794gsA",
+      "verifier_jwk": {
+        "crv": "P-256",
+        "kid": "merchant-1",
+        "kty": "EC",
+        "x": "6xqNqlBzEIlHjSOlsJyjNmzBh3rOtK8RmxHevf3Xvic",
+        "y": "QIxXDHY5bn5u-ytdC-q-wZljT_KTanMRQA6XzbuhEOo"
+      },
+      "expected": {
+        "status": "Success",
+        "iss": "https://merchant.example.org",
+        "iat": 1790353677,
+        "reference": "ref-3",
+        "order_id": "order-3"
+      }
+    },
+    {
+      "receipt": "eyJhbGciOiAiRVMyNTYiLCAidHlwIjogIkpXVCIsICJraWQiOiAibWVyY2hhbnQtMSJ9.eyJzdGF0dXMiOiAiU3VjY2VzcyIsICJpc3MiOiAiaHR0cHM6Ly9tZXJjaGFudC5leGFtcGxlLm9yZyIsICJpYXQiOiAxNzkwMzUzNjc3LCAicmVmZXJlbmNlIjogInJlZi00IiwgIm9yZGVyX2lkIjogIm9yZGVyLTQifQ.34FK9T3ObvYgCOqa4y2rIFa1R46uL_GkiSz3WDnkwtHEX3HV4lCDawn5qtDp6TqUOR8JIeOseoDJleGzA1tPPw",
+      "verifier_jwk": {
+        "crv": "P-256",
+        "kid": "merchant-1",
+        "kty": "EC",
+        "x": "E7HHgnpN4xjcXmnuhsOzW92MJcUCMoYsIXy8bkl8ZZ8",
+        "y": "pB8VjUWQFITNG7sSWIUghIeU2U8IJuCmn_e31zf7xFQ"
+      },
+      "expected": {
+        "status": "Success",
+        "iss": "https://merchant.example.org",
+        "iat": 1790353677,
+        "reference": "ref-4",
+        "order_id": "order-4"
+      }
+    },
+    {
+      "receipt": "eyJhbGciOiAiRVMyNTYiLCAidHlwIjogIkpXVCIsICJraWQiOiAibWVyY2hhbnQtMSJ9.eyJzdGF0dXMiOiAiU3VjY2VzcyIsICJpc3MiOiAiaHR0cHM6Ly9tZXJjaGFudC5leGFtcGxlLm9yZyIsICJpYXQiOiAxNzkwMzUzNjc3LCAicmVmZXJlbmNlIjogInJlZi01IiwgIm9yZGVyX2lkIjogIm9yZGVyLTUifQ.hPivmVfIU6RkHf0_CQBUlqiu6XQZmfkJGOIt1MmIkcujRcqrc4lx4B9UnGvmEbUT6VSiIemS0fsiM4PNGyo7kw",
+      "verifier_jwk": {
+        "crv": "P-256",
+        "kid": "merchant-1",
+        "kty": "EC",
+        "x": "1q9TVg4YSDcW-ynH60nJqv6BWYFMXTczo3N_lzi_9H4",
+        "y": "cepGQXE7Wxi46fPrccHX9txpWGjA_ALE3BJCHQcym1w"
+      },
+      "expected": {
+        "status": "Success",
+        "iss": "https://merchant.example.org",
+        "iat": 1790353677,
+        "reference": "ref-5",
+        "order_id": "order-5"
+      }
+    }
+  ]
+}

@@ -1,4 +1,5 @@
-//! Compact JWS with ES256 only (RFC 7515, RFC 7518 §3.4).
+//! Compact JWS with ES256 only (RFC 7515, RFC 7518 §3.4). Public for other crates
+//! in this workspace that sign JWTs (receipts); mandates use it internally.
 
 use p256::ecdsa::Signature;
 use p256::ecdsa::signature::Verifier;
@@ -6,16 +7,16 @@ use serde_json::{Map, Value};
 
 use crate::{Error, PublicJwk, SigningKey, b64};
 
-pub(crate) struct Decoded {
+/// A decoded compact JWS.
+pub struct Decoded {
+    /// Protected header.
     pub header: Map<String, Value>,
+    /// Payload.
     pub payload: Map<String, Value>,
 }
 
-pub(crate) fn sign(
-    header: &Map<String, Value>,
-    payload: &Map<String, Value>,
-    key: &SigningKey,
-) -> String {
+/// Signs `payload` with ES256 under `header` (which should carry `alg: ES256`).
+pub fn sign(header: &Map<String, Value>, payload: &Map<String, Value>, key: &SigningKey) -> String {
     let signing_input = format!(
         "{}.{}",
         b64::encode(Value::Object(header.clone()).to_string()),
@@ -27,7 +28,7 @@ pub(crate) fn sign(
 
 /// Decodes without checking the signature. Callers must [`verify`] before
 /// trusting anything in the result.
-pub(crate) fn decode(compact: &str) -> Result<Decoded, Error> {
+pub fn decode(compact: &str) -> Result<Decoded, Error> {
     let mut parts = compact.split('.');
     let (Some(h), Some(p), Some(_), None) =
         (parts.next(), parts.next(), parts.next(), parts.next())
@@ -40,7 +41,8 @@ pub(crate) fn decode(compact: &str) -> Result<Decoded, Error> {
     })
 }
 
-pub(crate) fn verify(compact: &str, key: &PublicJwk) -> Result<Decoded, Error> {
+/// Verifies an ES256 compact JWS with `key` and returns its contents.
+pub fn verify(compact: &str, key: &PublicJwk) -> Result<Decoded, Error> {
     let decoded = decode(compact)?;
     match decoded.header.get("alg").and_then(Value::as_str) {
         Some("ES256") => {}

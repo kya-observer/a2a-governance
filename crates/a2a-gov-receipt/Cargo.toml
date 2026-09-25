@@ -1,0 +1,19 @@
+[package]
+name = "a2a-gov-receipt"
+description = "Signed Mandate Receipts (AP2-compatible) and a tamper-evident receipt log"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+a2a-gov-mandate.workspace = true
+base64 = "0.23.1"
+serde.workspace = true
+serde_json.workspace = true
+sha2 = "0.11.0"
+thiserror.workspace = true
+
+[lints]
+workspace = true

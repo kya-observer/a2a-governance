@@ -16,7 +16,7 @@ mod chain;
 mod error;
 mod issue;
 mod jwk;
-mod jws;
+pub mod jws;
 mod keys;
 pub mod sdjwt;
 
