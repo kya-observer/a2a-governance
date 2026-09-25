@@ -44,6 +44,44 @@ impl SigningKey {
         self.kid.as_deref()
     }
 
+    /// Restores a key from a private P-256 JWK (`kty`, `crv`, `d`, `x`, `y`,
+    /// optional `kid`). The public coordinates must match `d`.
+    pub fn from_private_jwk(jwk: &serde_json::Value) -> Result<Self, crate::Error> {
+        let bad = |why: &str| crate::Error::InvalidKey(why.to_owned());
+        let d = jwk
+            .get("d")
+            .and_then(serde_json::Value::as_str)
+            .ok_or_else(|| bad("missing d"))?;
+        let scalar = crate::b64::decode(d)?;
+        let inner =
+            P256SigningKey::from_slice(&scalar).map_err(|_| bad("d is not a P-256 scalar"))?;
+        let mut public = jwk.clone();
+        if let Some(obj) = public.as_object_mut() {
+            obj.remove("d");
+        }
+        let key = Self {
+            inner,
+            kid: jwk
+                .get("kid")
+                .and_then(serde_json::Value::as_str)
+                .map(str::to_owned),
+        };
+        if PublicJwk::from_value(&public)? != key.public_jwk() {
+            return Err(bad("x and y don't match d"));
+        }
+        Ok(key)
+    }
+
+    /// The key as a private JWK, for storage. Treat the result as a secret.
+    pub fn to_private_jwk(&self) -> serde_json::Value {
+        let mut jwk = self.public_jwk().to_value();
+        jwk["d"] = serde_json::Value::String(crate::b64::encode(self.inner.to_bytes()));
+        if let Some(kid) = &self.kid {
+            jwk["kid"] = serde_json::Value::String(kid.clone());
+        }
+        jwk
+    }
+
     /// The public half as a JWK.
     pub fn public_jwk(&self) -> PublicJwk {
         PublicJwk::from_verifying_key(self.inner.verifying_key())

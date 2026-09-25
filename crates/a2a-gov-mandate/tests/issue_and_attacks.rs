@@ -547,3 +547,67 @@ fn the_agent_cannot_withhold_exp() {
         "{err}"
     );
 }
+
+// --- Key persistence (for agents that keep their key between runs) ----------------------
+
+#[test]
+fn a_signing_key_round_trips_through_a_private_jwk() {
+    let key = SigningKey::generate().with_kid("agent-1");
+    let jwk = key.to_private_jwk();
+    assert_eq!(jwk["kid"], json!("agent-1"));
+    assert!(jwk["d"].is_string());
+    let restored = SigningKey::from_private_jwk(&jwk).unwrap();
+    assert_eq!(restored.public_jwk(), key.public_jwk());
+    assert_eq!(restored.kid(), Some("agent-1"));
+    // A mandate bound to the original key can be presented with the restored one.
+    let f = Fixture {
+        surface: SigningKey::generate(),
+        agent: key,
+        open: String::new(),
+    };
+    let open = issue_open(&open_mandate(&f.agent), &Disclosable::none(), &f.surface).unwrap();
+    let hop = present(
+        &open,
+        &closed_mandate(),
+        &Disclosable::none(),
+        &restored,
+        AUD,
+        NONCE,
+        NOW,
+    )
+    .unwrap();
+    let key_pub = f.surface.public_jwk();
+    assert!(
+        verify_chain(
+            &join(&[&open, &hop]),
+            move |_| Some(key_pub.clone()),
+            &VerifyOptions::new(AUD, NONCE, NOW)
+        )
+        .is_ok()
+    );
+}
+
+#[test]
+fn a_private_jwk_must_match_its_public_coordinates() {
+    let key = SigningKey::generate();
+    let mut jwk = key.to_private_jwk();
+    jwk["x"] = SigningKey::generate().public_jwk().to_value()["x"].clone();
+    assert!(matches!(
+        SigningKey::from_private_jwk(&jwk),
+        Err(Error::InvalidKey(_))
+    ));
+    for bad in [
+        json!({ "kty": "EC", "crv": "P-256" }),
+        json!({ "kty": "RSA", "d": "x" }),
+        json!("d"),
+    ] {
+        assert!(SigningKey::from_private_jwk(&bad).is_err(), "{bad}");
+    }
+}
+
+#[test]
+fn debug_output_never_shows_the_private_key() {
+    let key = SigningKey::generate().with_kid("k");
+    let d = key.to_private_jwk()["d"].as_str().unwrap().to_owned();
+    assert!(!format!("{key:?}").contains(&d));
+}
