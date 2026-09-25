@@ -661,3 +661,17 @@ fn a_request_must_state_every_dimension_the_mandate_restricts() {
         );
     }
 }
+
+#[test]
+fn a_zero_use_limit_is_reported_as_malformed_not_spent() {
+    let w = world_with(json!([{ "type": "access.max_uses", "max_uses": 0 }]));
+    match decide(&w, &call()) {
+        Decision::Deny {
+            reason: DenyReason::InvalidMandate,
+            detail,
+        } => {
+            assert!(detail.contains("positive integer"), "{detail}");
+        }
+        other => panic!("{other:?}"),
+    }
+}
