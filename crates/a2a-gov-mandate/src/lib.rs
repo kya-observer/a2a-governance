@@ -20,6 +20,9 @@ mod jws;
 mod keys;
 pub mod sdjwt;
 
+#[cfg(test)]
+mod forged_tests;
+
 pub use chain::{
     HopKind, MAX_CHAIN_BYTES, MAX_HOPS, VerifiedChain, VerifiedHop, VerifyOptions, verify_chain,
 };
