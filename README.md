@@ -27,8 +27,8 @@ directions.
 
 > **Status: in development (v0.1, unreleased).** Implemented and tested: the extension
 > surface, AP2-compatible mandates, receipts and the receipt log, the decision engine,
-> the A2A message shapes, and signed Agent Cards. In progress: Python bindings for agent
-> developers, an example agent, and gateway integration. Expect breaking changes.
+> the A2A message shapes, signed Agent Cards, and a Python package for agents. In
+> progress: an example agent and gateway integration. Expect breaking changes.
 
 ## What's here
 
@@ -40,6 +40,7 @@ directions.
 | [`crates/a2a-gov-mandate`](crates/a2a-gov-mandate) | Mandate chains in AP2's wire format: issue, delegate, present, verify |
 | [`crates/a2a-gov-pdp`](crates/a2a-gov-pdp) | The decision engine: Pass / Deny / Challenge for a concrete call, with constraints, use limits, nonces and revocation behind store traits |
 | [`crates/a2a-gov-receipt`](crates/a2a-gov-receipt) | Signed Mandate Receipts (AP2-compatible) and a hash-chained receipt log |
+| [`bindings/python`](bindings/python) | `a2a-governance` for Python agents: key handling, presenting a mandate, Deny/Challenge, receipts, `a2a-sdk` helpers (PyO3 over the Rust crates) |
 | [`interop/ap2`](interop/ap2) | Cross-verification against Google's AP2 Python SDK |
 | [`interop/a2a`](interop/a2a) | The A2A shapes checked with the official `a2a-sdk` |
 | [`scripts/mutation-check.py`](scripts/mutation-check.py) | Mutation testing for every security check |
