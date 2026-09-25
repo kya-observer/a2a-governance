@@ -1,0 +1,16 @@
+[package]
+name = "a2a-gov-mandate"
+description = "Mandates and receipts wire-compatible with the AP2 Agent Authorization model (SD-JWT, KB-SD-JWT delegation chains)"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+
+[lints]
+workspace = true
