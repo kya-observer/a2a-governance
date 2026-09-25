@@ -25,6 +25,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "a2a-gov-pdp"
+version = "0.1.0"
+dependencies = [
+ "a2a-gov-extension",
+ "a2a-gov-mandate",
+ "a2a-gov-receipt",
+ "base64",
+ "getrandom",
+ "serde_json",
+]
+
+[[package]]
 name = "a2a-gov-receipt"
 version = "0.1.0"
 dependencies = [

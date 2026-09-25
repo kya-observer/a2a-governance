@@ -1,0 +1,19 @@
+[package]
+name = "a2a-gov-pdp"
+description = "Decision engine for the A2A Delegation Governance extension: verifies a mandate chain against a concrete A2A call"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+a2a-gov-extension.workspace = true
+a2a-gov-mandate.workspace = true
+a2a-gov-receipt.workspace = true
+base64 = "0.23.1"
+getrandom = "0.4.3"
+serde_json.workspace = true
+
+[lints]
+workspace = true
