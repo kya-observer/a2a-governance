@@ -31,8 +31,9 @@ Each hop's payload holds exactly one mandate as a selectively disclosable elemen
 
 Hops after the first also carry `iat`, `aud`, `nonce` and the binding hash. Inside a
 mandate, individual fields (`_sd`) and array elements (`{"...": digest}`) can also be
-selectively disclosable. For example, each constraint is its own disclosure, so an agent
-reveals only the constraints that apply to a verifier.
+encoded as disclosures, as AP2 does. This profile still requires every disclosure to be
+presented: a holder can't withhold any part of a mandate (see
+[Where this implementation is stricter than AP2 v0.2](#where-this-implementation-is-stricter-than-ap2-v02)).
 
 ## The access mandate (`mandate.access.1`)
 
