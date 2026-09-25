@@ -179,3 +179,23 @@ fn nested_disclosures_resolve_recursively() {
         json!({ "address": { "city": "Paris" } })
     );
 }
+
+#[test]
+fn jws_headers_and_payloads_with_duplicate_keys_are_rejected() {
+    let key = SigningKey::generate();
+    for (header, payload) in [
+        (r#"{"alg":"ES256","alg":"none"}"#, r#"{"a":1}"#),
+        (r#"{"alg":"ES256"}"#, r#"{"exp":1,"exp":9999999999}"#),
+        (r#"{"alg":"ES256"}"#, r#"{"cnf":{"jwk":{"x":"a","x":"b"}}}"#),
+    ] {
+        let input = format!("{}.{}", b64::encode(header), b64::encode(payload));
+        let compact = format!("{input}.{}", b64::encode(key.sign(input.as_bytes())));
+        assert!(
+            matches!(
+                jws::verify(&compact, &key.public_jwk()),
+                Err(Error::Malformed(_))
+            ),
+            "{header} {payload}"
+        );
+    }
+}

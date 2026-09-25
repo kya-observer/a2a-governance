@@ -15,13 +15,10 @@
         ],
         "metadata": {
           "https://kya.observer/ext/a2a-governance/v0.1": {
-            "approvalUrl": "https://approve.example.org/c/ch_1",
-            "nonce": "n1",
-            "aud": "https://vault.example.org/a2a",
-            "state": "pending",
             "challengeId": "ch_1",
+            "nonce": "n1",
             "mandateRequest": {
-              "exp": 1790003600.0,
+              "vct": "mandate.access.1",
               "constraints": [
                 {
                   "type": "access.authorization_details",
@@ -42,8 +39,11 @@
                   "max_uses": 3.0
                 }
               ],
-              "vct": "mandate.access.1"
-            }
+              "exp": 1790003600.0
+            },
+            "aud": "https://vault.example.org/a2a",
+            "state": "pending",
+            "approvalUrl": "https://approve.example.org/c/ch_1"
           }
         },
         "extensions": [
@@ -66,9 +66,9 @@
         "metadata": {
           "https://kya.observer/ext/a2a-governance/v0.1": {
             "nonce": "n2",
-            "mandate": "eyJhbGciOiJFUzI1NiJ9.e30.sig~",
             "aud": "https://vault.example.org/a2a",
-            "state": "approved"
+            "state": "approved",
+            "mandate": "eyJhbGciOiJFUzI1NiJ9.e30.sig~"
           }
         },
         "extensions": [
@@ -113,10 +113,10 @@
       "metadata": {
         "https://kya.observer/ext/a2a-governance/v0.1": {
           "holderJwk": {
-            "y": "BBBB",
-            "kty": "EC",
             "crv": "P-256",
-            "x": "AAAA"
+            "y": "BBBB",
+            "x": "AAAA",
+            "kty": "EC"
           }
         }
       },
@@ -136,8 +136,8 @@
       ],
       "metadata": {
         "https://kya.observer/ext/a2a-governance/v0.1": {
-          "nonce": "n2",
-          "presentation": "open~~closing~"
+          "presentation": "open~~closing~",
+          "nonce": "n2"
         }
       },
       "extensions": [
@@ -154,8 +154,8 @@
     ],
     "metadata": {
       "https://kya.observer/ext/a2a-governance/v0.1": {
-        "receipt": "eyJhbGciOiJFUzI1NiJ9.e30.sig",
-        "nextNonce": "n3"
+        "nextNonce": "n3",
+        "receipt": "eyJhbGciOiJFUzI1NiJ9.e30.sig"
       }
     },
     "extensions": [

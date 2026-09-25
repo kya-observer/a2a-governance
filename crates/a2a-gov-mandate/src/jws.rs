@@ -62,8 +62,9 @@ pub fn verify(compact: &str, key: &PublicJwk) -> Result<Decoded, Error> {
 }
 
 fn json_object(segment: &str, what: &str) -> Result<Map<String, Value>, Error> {
-    match serde_json::from_slice(&b64::decode(segment)?) {
+    match crate::strict_json::from_slice(&b64::decode(segment)?) {
         Ok(Value::Object(m)) => Ok(m),
-        _ => Err(Error::Malformed(format!("JWS {what} is not a JSON object"))),
+        Ok(_) => Err(Error::Malformed(format!("JWS {what} is not a JSON object"))),
+        Err(e) => Err(Error::Malformed(format!("JWS {what}: {e}"))),
     }
 }

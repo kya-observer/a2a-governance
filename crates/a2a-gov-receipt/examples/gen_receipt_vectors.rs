@@ -4,7 +4,7 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use a2a_gov_mandate::{Disclosable, SigningKey, issue_open, join, present};
-use a2a_gov_receipt::{Outcome, Receipt, reference_for};
+use a2a_gov_receipt::{Outcome, Receipt};
 use serde_json::{Map, Value, json};
 
 fn obj(v: Value) -> Map<String, Value> {
@@ -48,16 +48,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 description: "outside the mandate's scope".into(),
             }
         };
-        let receipt = Receipt::new(
-            "https://agent.example.org",
-            now,
-            outcome,
-            reference_for(&chain)?,
-        )
-        .with_method("SendMessage")
-        .with_task_id(&format!("task-{i}"))
-        .with_purpose("dpv:ServiceProvision")
-        .with_released(["title", "published"])?;
+        let receipt = Receipt::for_chain("https://agent.example.org", now, outcome, &chain)?
+            .with_method("SendMessage")
+            .with_task_id(&format!("task-{i}"))
+            .with_purpose("dpv:ServiceProvision")
+            .with_released(["title", "published"])?;
         vectors.push(json!({
             "chain": chain,
             "receipt": receipt.sign(&verifier),

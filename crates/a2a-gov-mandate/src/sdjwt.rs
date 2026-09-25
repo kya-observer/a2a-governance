@@ -42,7 +42,7 @@ impl Disclosure {
     /// Decodes and validates one disclosure string.
     pub fn parse(encoded: &str) -> Result<Self, Error> {
         let bytes = b64::decode(encoded).map_err(|_| Error::Disclosure("not base64url".into()))?;
-        let Ok(Value::Array(mut items)) = serde_json::from_slice::<Value>(&bytes) else {
+        let Ok(Value::Array(mut items)) = crate::strict_json::from_slice(&bytes) else {
             return Err(Error::Disclosure("not a JSON array".into()));
         };
         if !items.first().is_some_and(Value::is_string) {

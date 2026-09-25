@@ -19,6 +19,7 @@ mod jwk;
 pub mod jws;
 mod keys;
 pub mod sdjwt;
+mod strict_json;
 
 #[cfg(test)]
 mod forged_tests;

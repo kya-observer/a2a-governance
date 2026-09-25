@@ -52,8 +52,23 @@ reveals only the constraints that apply to a verifier.
 }
 ```
 
-The closed mandate in the closing hop keeps the same `vct` and describes one concrete
-A2A call (method, task, and a hash of the requested action).
+The open mandate **must** carry `vct`, `cnf.jwk` and `exp`. A mandate without `exp`
+would never expire.
+
+The closed mandate in the closing hop keeps the same `vct` and states the one call it
+authorizes. The verifier requires these fields to equal the call it's about to serve:
+
+```json
+{
+  "vct": "mandate.access.1",
+  "method": "SendMessage",
+  "task_id": "task-7f3c",
+  "authorization_details": [{ "type": "reading", "actions": ["search"], "fields": ["title"] }]
+}
+```
+
+Hop IDs, used for use counting and revocation, are the digest of each hop's JWS signing
+input (`header.payload`) without the signature, because ECDSA signatures are malleable.
 
 ## Where this implementation is stricter than AP2 v0.2
 
@@ -63,6 +78,9 @@ present:
 | Case | AP2 v0.2 SDK | This implementation | Why |
 |---|---|---|---|
 | Disclosure not referenced by any digest | Accepted (ignored) | **Rejected** | RFC 9901 §7.1 requires rejection. An agent signs its own closing hop, so it can make `sd_hash` cover anything it appends |
+| Digest whose disclosure is withheld (or a decoy) | Accepted; the claim is silently absent | **Rejected** | The holder picks what to forward and signs the next hop over its choice, so a withheld constraint or `exp` simply disappears |
+| Open mandate without `exp` | Accepted (`exp` is optional in AP2's schemas) | **Rejected** | It would never expire |
+| Duplicate JSON keys | Last value wins | **Rejected** | Parsers disagree on which duplicate wins |
 | `aud` / `nonce` on the closing hop | Checked only if the caller passes expected values | **Always required** | A closing hop without them is replayable anywhere |
 | Age of the closing hop | Unbounded | **At most 300 s** (configurable) | Limits the window for a captured presentation |
 | Mandates per hop | The closing hop may carry several | **Exactly one** | One call, one mandate; simpler to evaluate |
@@ -95,5 +113,11 @@ Found while building the interop suite. None of them blocks interoperability.
    own `chain_tests.py` does.
 5. **The receipt field differs between spec and SDK.** The spec's Mandate Receipt has
    `result`; the SDK's `ReceiptClient` writes `status`.
-6. **The PyPI package named `ap2` is not Google's.** Install the SDK from git, pinned by
+6. **Withheld disclosures and missing `exp` are accepted.** If an issuer makes a whole
+   constraint, or `exp`, selectively disclosable, the agent can withhold it and the
+   chain still verifies, minus that restriction. AP2's own payment and checkout mandates
+   keep whole constraints non-disclosable (selective disclosure is used inside
+   allow-lists, where withholding only narrows), but `exp` is optional in their schemas
+   and the verifier never requires it.
+7. **The PyPI package named `ap2` is not Google's.** Install the SDK from git, pinned by
    commit (see `interop/ap2/pyproject.toml`).

@@ -63,3 +63,13 @@ fn malformed_disclosures_are_rejected() {
         assert!(Disclosure::parse(&bad).is_err(), "accepted {bad}");
     }
 }
+
+#[test]
+fn disclosures_with_duplicate_keys_are_rejected() {
+    // Parsers disagree on which duplicate wins, so the same token could mean
+    // different things to different verifiers.
+    use base64::Engine;
+    let raw = r#"["salt", "limit", {"max": 1, "max": 1000}]"#;
+    let encoded = base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(raw);
+    assert!(Disclosure::parse(&encoded).is_err());
+}
