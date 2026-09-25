@@ -13,6 +13,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "a2a-gov-card"
+version = "0.1.0"
+dependencies = [
+ "a2a-gov-mandate",
+ "base64",
+ "serde_json",
+ "sha2",
+ "thiserror",
+]
+
+[[package]]
 name = "a2a-gov-extension"
 version = "0.1.0"
 dependencies = [

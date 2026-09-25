@@ -15,8 +15,9 @@ a2a-gov-mandate = { path = "crates/a2a-gov-mandate" }
 a2a-gov-receipt = { path = "crates/a2a-gov-receipt" }
 a2a-gov-pdp = { path = "crates/a2a-gov-pdp" }
 a2a-gov-binding = { path = "crates/a2a-gov-binding" }
+a2a-gov-card = { path = "crates/a2a-gov-card" }
 serde = { version = "1", features = ["derive"] }
-serde_json = { version = "1", features = ["preserve_order"] }
+serde_json = { version = "1", features = ["preserve_order", "float_roundtrip"] }
 thiserror = "2"
 
 [workspace.lints.rust]
