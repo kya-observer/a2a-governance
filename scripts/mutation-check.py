@@ -43,7 +43,7 @@ MUTATIONS: list[tuple[str, str, str, str, str]] = [
     ("mandate", "chain.rs", "delegation may lack cnf", "(HopKind::Delegation, false) if has_cnf => {}", "(HopKind::Delegation, false) => {}"),
     ("mandate", "chain.rs", "hop typ not checked", 'other => return Err(Error::Chain(format!("hop typ {other:?}"))),', "_ => HopKind::Closing,"),
     ("mandate", "jws.rs", "alg not checked", 'other => return Err(Error::UnsupportedAlgorithm(format!("{other:?}"))),', "_ => {}"),
-    ("mandate", "strict_json.rs", "duplicate keys allowed", "if !seen.insert(key.clone()) {", "if false {"),
+    ("mandate", "strict_json.rs", "duplicate keys allowed", "if !seen.insert(key.clone()) {", "if !seen.insert(key.clone()) && false {"),
     ("mandate", "chain.rs", "size limit removed", "if chain.len() > MAX_CHAIN_BYTES {", "if false {"),
     ("mandate", "chain.rs", "hop limit removed", "if raw.len() > MAX_HOPS {", "if false {"),
     ("mandate", "chain.rs", "single-segment accepted", "if raw.len() < 2 {", "if false {"),

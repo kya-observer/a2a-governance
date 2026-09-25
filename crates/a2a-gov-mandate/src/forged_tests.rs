@@ -112,11 +112,15 @@ fn a_digest_referenced_twice_is_rejected() {
     // RFC 9901 §7.1: reject if any digest appears more than once.
     let d = disclosure(json!(["s", "a", 1]));
     let payload = obj(json!({ "_sd": [digest(&d), digest(&d)] }));
-    assert!(matches!(resolve(payload, &[&d]), Err(Error::Disclosure(_))));
+    assert!(
+        matches!(resolve(payload, &[&d]), Err(Error::Disclosure(m)) if m.contains("more than once"))
+    );
 
     let e = disclosure(json!(["s", 1]));
     let payload = obj(json!({ "list": [{ "...": digest(&e) }, { "...": digest(&e) }] }));
-    assert!(matches!(resolve(payload, &[&e]), Err(Error::Disclosure(_))));
+    assert!(
+        matches!(resolve(payload, &[&e]), Err(Error::Disclosure(m)) if m.contains("more than once"))
+    );
 
     let decoy = digest("decoy");
     let payload = obj(json!({ "_sd": [decoy.clone()], "x": { "_sd": [decoy] } }));

@@ -11,7 +11,9 @@ Every commit must be signed off, certifying the [DCO](https://developercertifica
 git commit -s
 ```
 
-That adds `Signed-off-by: Your Name <you@example.com>`. No CLA is required.
+That adds `Signed-off-by: Your Name <you@example.com>`, which must match the commit's
+author. CI checks every commit in a pull request (`scripts/check-dco.sh`). To fix a
+branch, run `git rebase --signoff <base>`. No CLA is required.
 
 ## Before you open a pull request
 
