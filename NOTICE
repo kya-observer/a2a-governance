@@ -1,0 +1,8 @@
+A2A Delegation Governance
+Copyright 2026 The A2A Delegation Governance authors
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+The interop test suite (interop/ap2) runs against the Agent Payments Protocol (AP2)
+Python SDK by Google LLC, Apache License 2.0, which is fetched at test time and not
+redistributed here.
